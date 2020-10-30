@@ -58,199 +58,199 @@ local function CreateQuickSlider(name, label, ... ) --, neighborFrame, xOffset, 
 			--if columnFrame.OnFeedback then columnFrame:OnFeedback() end
 		end)
 		return frame, frame
-	end
+end
 
-	local function CreateQuickCheckbutton(name, label, ...)
-		local columnFrame = ...
-		local frame = PanelHelpers:CreateCheckButton(name, columnFrame, label)
-		--frame.Label:SetFont("FONTS/ARIALN.TTF", 14)
-		-- Margins	-- Bottom/Left are supposed to be negative
-		frame.Margins = { Left = 2, Right = 100, Top = 0, Bottom = 0,}
-		QuickSetPoints(frame, ...)
-		-- Set Feedback Function
-		frame:SetScript("OnClick", function()
-			--OnPanelItemChange()
-			columnFrame.Callback()
-			--if columnFrame.OnFeedback then columnFrame:OnFeedback() end
-		end)
-		return frame, frame
-	end
+local function CreateQuickCheckbutton(name, label, ...)
+    local columnFrame = ...
+    local frame = PanelHelpers:CreateCheckButton(name, columnFrame, label)
+    --frame.Label:SetFont("FONTS/ARIALN.TTF", 14)
+    -- Margins	-- Bottom/Left are supposed to be negative
+    frame.Margins = { Left = 2, Right = 100, Top = 0, Bottom = 0,}
+    QuickSetPoints(frame, ...)
+    -- Set Feedback Function
+    frame:SetScript("OnClick", function()
+        --OnPanelItemChange()
+        columnFrame.Callback()
+        --if columnFrame.OnFeedback then columnFrame:OnFeedback() end
+    end)
+    return frame, frame
+end
 
-	local function SetSliderMechanics(slider, value, minimum, maximum, increment)
-		slider:SetMinMaxValues(minimum, maximum)
-		slider:SetValueStep(increment)
-		slider:SetValue(value)
-	end
+local function SetSliderMechanics(slider, value, minimum, maximum, increment)
+    slider:SetMinMaxValues(minimum, maximum)
+    slider:SetValueStep(increment)
+    slider:SetValue(value)
+end
 
-	local function CreateQuickEditbox(name, ...)
-		local columnFrame = ...
-		local frame = CreateFrame("ScrollFrame", name, columnFrame, "UIPanelScrollFrameTemplate", "BackdropTemplate")
-		frame.BorderFrame = CreateFrame("Frame", nil, frame , "BackdropTemplate")
-		local EditBox = CreateFrame("EditBox", nil, frame, "BackdropTemplate")
-		-- Margins	-- Bottom/Left are supposed to be negative
-		frame.Margins = {Left = 4, Right = 24, Top = 8, Bottom = 8, }
+local function CreateQuickEditbox(name, ...)
+    local columnFrame = ...
+    local frame = CreateFrame("ScrollFrame", name, columnFrame, "UIPanelScrollFrameTemplate", "BackdropTemplate")
+    frame.BorderFrame = CreateFrame("Frame", nil, frame , "BackdropTemplate")
+    local EditBox = CreateFrame("EditBox", nil, frame, "BackdropTemplate")
+    -- Margins	-- Bottom/Left are supposed to be negative
+    frame.Margins = {Left = 4, Right = 24, Top = 8, Bottom = 8, }
 
-		-- Frame Size
-		frame:SetWidth(165)
-		frame:SetHeight(125)
-		-- Border
-		frame.BorderFrame:SetPoint("TOPLEFT", 0, 5)
-		frame.BorderFrame:SetPoint("BOTTOMRIGHT", 3, -5)
-		frame.BorderFrame:SetBackdrop({bgFile = "Interface/Tooltips/UI-Tooltip-Background",
-											edgeFile = "Interface/Tooltips/UI-Tooltip-Border",
-											tile = true, tileSize = 16, edgeSize = 16,
-											insets = { left = 4, right = 4, top = 4, bottom = 4 }
-											});
-		frame.BorderFrame:SetBackdropColor(0.05, 0.05, 0.05, 0)
-		frame.BorderFrame:SetBackdropBorderColor(0.5, 0.5, 0.5, 1)
-		-- Text
+    -- Frame Size
+    frame:SetWidth(165)
+    frame:SetHeight(125)
+    -- Border
+    frame.BorderFrame:SetPoint("TOPLEFT", 0, 5)
+    frame.BorderFrame:SetPoint("BOTTOMRIGHT", 3, -5)
+    frame.BorderFrame:SetBackdrop({bgFile = "Interface/Tooltips/UI-Tooltip-Background",
+                                        edgeFile = "Interface/Tooltips/UI-Tooltip-Border",
+                                        tile = true, tileSize = 16, edgeSize = 16,
+                                        insets = { left = 4, right = 4, top = 4, bottom = 4 }
+                                        });
+    frame.BorderFrame:SetBackdropColor(0.05, 0.05, 0.05, 0)
+    frame.BorderFrame:SetBackdropBorderColor(0.5, 0.5, 0.5, 1)
+    -- Text
 
-		EditBox:SetPoint("TOPLEFT")
-		EditBox:SetPoint("BOTTOMLEFT")
-		EditBox:SetHeight(100)
-		EditBox:SetWidth(150)
-		EditBox:SetMultiLine(true)
+    EditBox:SetPoint("TOPLEFT")
+    EditBox:SetPoint("BOTTOMLEFT")
+    EditBox:SetHeight(100)
+    EditBox:SetWidth(150)
+    EditBox:SetMultiLine(true)
 
-		EditBox:SetFrameLevel(frame:GetFrameLevel()-1)
-		EditBox:SetFont("Fonts\\FRIZQT__.TTF", 11, "NONE")
-		EditBox:SetText("Empty")
-		EditBox:SetAutoFocus(false)
-		EditBox:SetTextInsets(9, 6, 2, 2)
-		frame:SetScrollChild(EditBox)
-		frame.EditBox = EditBox
-		--EditBox:SetIndentedWordWrap(true)
-		--print(name, EditBox:GetFrameLevel(), frame:GetFrameLevel(), EditBox:GetFrameStrata(), frame:GetFrameStrata())
-		-- Functions
-		--function frame:GetValue() return SplitToTable(strsplit("\n", EditBox:GetText() )) end
-		--function frame:SetValue(value) EditBox:SetText(TableToString(value)) end
-		function frame:GetValue() return EditBox:GetText() end
-		function frame:SetValue(value) EditBox:SetText(value) end
-		frame._SetWidth = frame.SetWidth
-		function frame:SetWidth(value) frame:_SetWidth(value); EditBox:SetWidth(value) end
-		-- Set Positions
-		QuickSetPoints(frame, ...)
-		-- Set Feedback Function
-		--frame.OnValueChanged = columnFrame.OnFeedback
-		return frame, frame
-	end
+    EditBox:SetFrameLevel(frame:GetFrameLevel()-1)
+    EditBox:SetFont("Fonts\\FRIZQT__.TTF", 11, "NONE")
+    EditBox:SetText("Empty")
+    EditBox:SetAutoFocus(false)
+    EditBox:SetTextInsets(9, 6, 2, 2)
+    frame:SetScrollChild(EditBox)
+    frame.EditBox = EditBox
+    --EditBox:SetIndentedWordWrap(true)
+    --print(name, EditBox:GetFrameLevel(), frame:GetFrameLevel(), EditBox:GetFrameStrata(), frame:GetFrameStrata())
+    -- Functions
+    --function frame:GetValue() return SplitToTable(strsplit("\n", EditBox:GetText() )) end
+    --function frame:SetValue(value) EditBox:SetText(TableToString(value)) end
+    function frame:GetValue() return EditBox:GetText() end
+    function frame:SetValue(value) EditBox:SetText(value) end
+    frame._SetWidth = frame.SetWidth
+    function frame:SetWidth(value) frame:_SetWidth(value); EditBox:SetWidth(value) end
+    -- Set Positions
+    QuickSetPoints(frame, ...)
+    -- Set Feedback Function
+    --frame.OnValueChanged = columnFrame.OnFeedback
+    return frame, frame
+end
 
-	local function CreateQuickColorbox(name, label, ...)
-		local columnFrame = ...
-		local frame = PanelHelpers:CreateColorBox(name, columnFrame, label, 0, .5, 1, 1)
-		-- Margins	-- Bottom/Left are supposed to be negative
-		frame.Margins = { Left = 5, Right = 100, Top = 3, Bottom = 2,}
-		-- Set Positions
-		QuickSetPoints(frame, ...)
-		-- Set Feedback Function
-		frame.OnValueChanged = function() columnFrame.Callback() end
-		--frame.OnValueChanged = columnFrame.OnFeedback
-		return frame, frame
-	end
+local function CreateQuickColorbox(name, label, ...)
+    local columnFrame = ...
+    local frame = PanelHelpers:CreateColorBox(name, columnFrame, label, 0, .5, 1, 1)
+    -- Margins	-- Bottom/Left are supposed to be negative
+    frame.Margins = { Left = 5, Right = 100, Top = 3, Bottom = 2,}
+    -- Set Positions
+    QuickSetPoints(frame, ...)
+    -- Set Feedback Function
+    frame.OnValueChanged = function() columnFrame.Callback() end
+    --frame.OnValueChanged = columnFrame.OnFeedback
+    return frame, frame
+end
 
-	local function CreateQuickDropdown(name, label, dropdownTable, initialValue, ...)
-		local columnFrame = ...
+local function CreateQuickDropdown(name, label, dropdownTable, initialValue, ...)
+    local columnFrame = ...
 
-		local frame = PanelHelpers:CreateDropdownFrame(name, columnFrame, dropdownTable, initialValue, label)		--- ADD the new valueMethod  (2 for Token)
-		-- Margins	-- Bottom/Left are supposed to be negative
-		frame.Margins = { Left = -12, Right = 2, Top = 22, Bottom = 0,}
-		-- Set Positions
-		QuickSetPoints(frame, ...)
-		-- Set Feedback Function
-		frame.OnValueChanged = function() columnFrame.Callback() end
-		--frame.OnValueChanged = columnFrame.OnFeedback
-		return frame, frame
-	end
+    local frame = PanelHelpers:CreateDropdownFrame(name, columnFrame, dropdownTable, initialValue, label)		--- ADD the new valueMethod  (2 for Token)
+    -- Margins	-- Bottom/Left are supposed to be negative
+    frame.Margins = { Left = -12, Right = 2, Top = 22, Bottom = 0,}
+    -- Set Positions
+    QuickSetPoints(frame, ...)
+    -- Set Feedback Function
+    frame.OnValueChanged = function() columnFrame.Callback() end
+    --frame.OnValueChanged = columnFrame.OnFeedback
+    return frame, frame
+end
 
-	local function CreateQuickHeadingLabel(name, label, ...)
-		local columnFrame = ...
-		local frame = CreateFrame("Frame", name, columnFrame)
-		-- Heading Appearance
-		frame:SetHeight(26)
-		frame:SetWidth(500)
-		frame.Text = frame:CreateFontString(nil, 'ARTWORK', 'GameFontNormal')
-		frame.Text:SetFont(font, 26)
-		frame.Text:SetTextColor(255/255, 105/255, 6/255)
-		frame.Text:SetAllPoints()
-		frame.Text:SetText(label)
-		frame.Text:SetJustifyH("LEFT")
-		frame.Text:SetJustifyV("BOTTOM")
-                -- Divider Line
-                frame.DividerLine = frame:CreateTexture(nil, 'ARTWORK')
-                frame.DividerLine:SetTexture(divider)
-                frame.DividerLine:SetSize( 500, 12)
-                frame.DividerLine:SetPoint("BOTTOMLEFT", frame.Text, "TOPLEFT", 0, 5)
-		-- Margins
-		frame.Margins = { Left = 6, Right = 2, Top = 12, Bottom = 2,}
-		-- Set Positions
-		QuickSetPoints(frame, ...)
-		-- Bookmark
-		local bookmark = CreateFrame("Frame", nil, columnFrame, "BackdropTemplate")
-		bookmark:SetPoint("TOPLEFT", columnFrame, "TOPLEFT")
-		bookmark:SetPoint("BOTTOMRIGHT", frame, "BOTTOMRIGHT")
-		columnFrame.Headings = columnFrame.Headings or {}
-		columnFrame.Headings[(#columnFrame.Headings)+1] = label
-		columnFrame.HeadingBookmarks = columnFrame.HeadingBookmarks or {}
-		columnFrame.HeadingBookmarks[label] = bookmark
-		-- Done!
-		return frame, frame
-	end
+local function CreateQuickHeadingLabel(name, label, ...)
+    local columnFrame = ...
+    local frame = CreateFrame("Frame", name, columnFrame)
+    -- Heading Appearance
+    frame:SetHeight(26)
+    frame:SetWidth(500)
+    frame.Text = frame:CreateFontString(nil, 'ARTWORK', 'GameFontNormal')
+    frame.Text:SetFont(font, 26)
+    frame.Text:SetTextColor(255/255, 105/255, 6/255)
+    frame.Text:SetAllPoints()
+    frame.Text:SetText(label)
+    frame.Text:SetJustifyH("LEFT")
+    frame.Text:SetJustifyV("BOTTOM")
+            -- Divider Line
+            frame.DividerLine = frame:CreateTexture(nil, 'ARTWORK')
+            frame.DividerLine:SetTexture(divider)
+            frame.DividerLine:SetSize( 500, 12)
+            frame.DividerLine:SetPoint("BOTTOMLEFT", frame.Text, "TOPLEFT", 0, 5)
+    -- Margins
+    frame.Margins = { Left = 6, Right = 2, Top = 12, Bottom = 2,}
+    -- Set Positions
+    QuickSetPoints(frame, ...)
+    -- Bookmark
+    local bookmark = CreateFrame("Frame", nil, columnFrame, "BackdropTemplate")
+    bookmark:SetPoint("TOPLEFT", columnFrame, "TOPLEFT")
+    bookmark:SetPoint("BOTTOMRIGHT", frame, "BOTTOMRIGHT")
+    columnFrame.Headings = columnFrame.Headings or {}
+    columnFrame.Headings[(#columnFrame.Headings)+1] = label
+    columnFrame.HeadingBookmarks = columnFrame.HeadingBookmarks or {}
+    columnFrame.HeadingBookmarks[label] = bookmark
+    -- Done!
+    return frame, frame
+end
 
-	local function CreateDrawer(name, label, ...)
-		local columnFrame = ...
-		local frame = CreateFrame("Frame", name, columnFrame, "BackdropTemplate")
-		frame.AnchorButton = CreateFrame("Button", name.."Button", columnFrame, "BackdropTemplate")
+local function CreateDrawer(name, label, ...)
+    local columnFrame = ...
+    local frame = CreateFrame("Frame", name, columnFrame, "BackdropTemplate")
+    frame.AnchorButton = CreateFrame("Button", name.."Button", columnFrame, "BackdropTemplate")
 
-		-- Heading Appearance
-		frame:SetHeight(26)
-		frame:SetWidth(500)
-		-- Clicky Button
+    -- Heading Appearance
+    frame:SetHeight(26)
+    frame:SetWidth(500)
+    -- Clicky Button
 
-		--frame.Border = frame:CreateTexture(nil, "ARTWORK")
+    --frame.Border = frame:CreateTexture(nil, "ARTWORK")
 
-		frame.Text = frame:CreateFontString(nil, 'ARTWORK', 'GameFontNormal')
-		frame.Text:SetFont(font, 26)
-		frame.Text:SetTextColor(255/255, 105/255, 6/255)
-		frame.Text:SetAllPoints()
-		frame.Text:SetText("Test Text")
-		frame.Text:SetJustifyH("LEFT")
-		frame.Text:SetJustifyV("BOTTOM")
+    frame.Text = frame:CreateFontString(nil, 'ARTWORK', 'GameFontNormal')
+    frame.Text:SetFont(font, 26)
+    frame.Text:SetTextColor(255/255, 105/255, 6/255)
+    frame.Text:SetAllPoints()
+    frame.Text:SetText("Test Text")
+    frame.Text:SetJustifyH("LEFT")
+    frame.Text:SetJustifyV("BOTTOM")
 
-		--frame.Button = CreateFrame("Button", name.."Button", frame, "BackdropTemplate")
+    --frame.Button = CreateFrame("Button", name.."Button", frame, "BackdropTemplate")
 
-		--local frame = CreateFrame("ScrollFrame", name, columnFrame, "UIPanelScrollFrameTemplate", "BackdropTemplate")
-		--:SetScrollChild()
+    --local frame = CreateFrame("ScrollFrame", name, columnFrame, "UIPanelScrollFrameTemplate", "BackdropTemplate")
+    --:SetScrollChild()
 
-		-- Margins
-		frame.Margins = { Left = 6, Right = 2, Top = 12, Bottom = 2,}
-		-- Set Positions
-		QuickSetPoints(frame.AnchorButton, ...)
-		frame:SetPoint("TOPLEFT", frame.AnchorButton, "TOPLEFT", 0, 0)
-		-- Done!
-		return frame, frame
-	end
+    -- Margins
+    frame.Margins = { Left = 6, Right = 2, Top = 12, Bottom = 2,}
+    -- Set Positions
+    QuickSetPoints(frame.AnchorButton, ...)
+    frame:SetPoint("TOPLEFT", frame.AnchorButton, "TOPLEFT", 0, 0)
+    -- Done!
+    return frame, frame
+end
 
-	local function CreateQuickItemLabel(name, label, ...)
-		local columnFrame = ...
-		local frame = CreateFrame("Frame", name, columnFrame, "BackdropTemplate")
-		frame:SetHeight(15)
-		frame:SetWidth(500)
-		frame.Text = frame:CreateFontString(nil, 'ARTWORK', 'GameFontNormal')
-		--frame.Text = frame:CreateFontString(nil, 'ARTWORK', 'GameFontNormal')
-		-- frame.Text:SetFont("Fonts\\FRIZQT__.TTF", 18 )
-		-- frame.Text:SetFont("Fonts\\ARIALN.TTF", 18 )
-		--frame.Text:SetFont(font, 22 )
-		--frame.Text:SetTextColor(1, .7, 0)
-		--frame.Text:SetTextColor(55/255, 173/255, 255/255)
-		frame.Text:SetAllPoints()
-		frame.Text:SetText(label)
-		frame.Text:SetJustifyH("LEFT")
-		frame.Text:SetJustifyV("BOTTOM")
-		-- Margins	-- Bottom/Left are supposed to be negative
-		frame.Margins = { Left = 6, Right = 2, Top = 2, Bottom = 2,}
-		-- Set Positions
-		QuickSetPoints(frame, ...)
-		return frame, frame
-	end
+local function CreateQuickItemLabel(name, label, ...)
+    local columnFrame = ...
+    local frame = CreateFrame("Frame", name, columnFrame, "BackdropTemplate")
+    frame:SetHeight(15)
+    frame:SetWidth(500)
+    frame.Text = frame:CreateFontString(nil, 'ARTWORK', 'GameFontNormal')
+    --frame.Text = frame:CreateFontString(nil, 'ARTWORK', 'GameFontNormal')
+    -- frame.Text:SetFont("Fonts\\FRIZQT__.TTF", 18 )
+    -- frame.Text:SetFont("Fonts\\ARIALN.TTF", 18 )
+    --frame.Text:SetFont(font, 22 )
+    --frame.Text:SetTextColor(1, .7, 0)
+    --frame.Text:SetTextColor(55/255, 173/255, 255/255)
+    frame.Text:SetAllPoints()
+    frame.Text:SetText(label)
+    frame.Text:SetJustifyH("LEFT")
+    frame.Text:SetJustifyV("BOTTOM")
+    -- Margins	-- Bottom/Left are supposed to be negative
+    frame.Margins = { Left = 6, Right = 2, Top = 2, Bottom = 2,}
+    -- Set Positions
+    QuickSetPoints(frame, ...)
+    return frame, frame
+end
 
 local function OnMouseWheelScrollFrame(frame, value, name)
 	local scrollbar = _G[frame:GetName() .. "ScrollBar"];

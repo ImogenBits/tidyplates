@@ -40,12 +40,12 @@ local InstanceStatus = TidyPlatesUtility.InstanceStatus
 local IsEnemyTanked = TidyPlatesWidgets.IsEnemyTanked
 
 local function IsOffTanked(unit)
-	local unitid = unit.unitid
-	if unitid and LocalVars.EnableOffTankHighlight then
-		local targetOf = unitid.."target"
-		return ("TANK" == UnitGroupRolesAssigned(targetOf))
-			or (LocalVars.CountPetAsOtherTank and UnitExists(targetOf) and not UnitIsPlayer(targetOf))
-	end
+    local unitid = unit.unitid
+    if unitid and LocalVars.EnableOffTankHighlight then
+        local targetOf = unitid.."target"
+        return ("TANK" == UnitGroupRolesAssigned(targetOf))
+            or (LocalVars.CountPetAsOtherTank and UnitExists(targetOf) and not UnitIsPlayer(targetOf))
+    end
 end
 
 
@@ -55,10 +55,10 @@ local function DummyFunction() return end
 -- Define the Menu for Threat Modes
 TidyPlatesHubDefaults.ThreatWarningMode = "Auto"
 TidyPlatesHubMenus.ThreatWarningModes = {
-					{ text = "Auto (Color Swap)", value = "Auto",} ,
-					{ text = "Tank", value = "Tank",} ,
-					{ text = "DPS/Healer", value = "DPS",} ,
-					}
+                    { text = "Auto (Color Swap)", value = "Auto",} ,
+                    { text = "Tank", value = "Tank",} ,
+                    { text = "DPS/Healer", value = "DPS",} ,
+                    }
 
 local NormalGrey = {r = .65, g = .65, b = .65, a = .4}
 local EliteGrey = {r = .9, g = .7, b = .3, a = .5}
@@ -86,40 +86,40 @@ local RaidClassColors = RAID_CLASS_COLORS
 ------------------------------------------------------------------------------------
 
 local ReactionColors = {
-	["FRIENDLY"] = {
-		["PLAYER"] = {r = 0, g = 0, b = 1,},
-		["NPC"] = {r = 0, g = 1, b = 0,},
-	},
-	["HOSTILE"] = {
-		["PLAYER"] = {r = 1, g = 0, b = 0,},
-		["NPC"] = {r = 1, g = 0, b = 0,},
-	},
-	["NEUTRAL"] = {
-		["NPC"] = {r = 1, g = 1, b = 0,},
-	},
-	["TAPPED"] = {
-		["NPC"] = {r = .45, g = .45, b = .45,},
-	},
+    ["FRIENDLY"] = {
+        ["PLAYER"] = {r = 0, g = 0, b = 1,},
+        ["NPC"] = {r = 0, g = 1, b = 0,},
+    },
+    ["HOSTILE"] = {
+        ["PLAYER"] = {r = 1, g = 0, b = 0,},
+        ["NPC"] = {r = 1, g = 0, b = 0,},
+    },
+    ["NEUTRAL"] = {
+        ["NPC"] = {r = 1, g = 1, b = 0,},
+    },
+    ["TAPPED"] = {
+        ["NPC"] = {r = .45, g = .45, b = .45,},
+    },
 }
 
 
 
 local NameReactionColors = {
-	["FRIENDLY"] = {
-		["PLAYER"] = {r = 60/255, g = 168/255, b = 255/255,},
-		["NPC"] = {r = 96/255, g = 224/255, b = 37/255,},
-	},
-	["HOSTILE"] = {
-		["PLAYER"] = {r = 255/255, g = 51/255, b = 32/255,},
-		["NPC"] = {r = 255/255, g = 51/255, b = 32/255,},
-	},
-	["NEUTRAL"] = {
-		["NPC"] = {r = 252/255, g = 180/255, b = 27/255,},
-	},
-	["TAPPED"] = {
-		--["NPC"] = {r = .8, g = .8, b = 1,},
-		["NPC"] = {r = .7, g = .7, b = .7,},
-	},
+    ["FRIENDLY"] = {
+        ["PLAYER"] = {r = 60/255, g = 168/255, b = 255/255,},
+        ["NPC"] = {r = 96/255, g = 224/255, b = 37/255,},
+    },
+    ["HOSTILE"] = {
+        ["PLAYER"] = {r = 255/255, g = 51/255, b = 32/255,},
+        ["NPC"] = {r = 255/255, g = 51/255, b = 32/255,},
+    },
+    ["NEUTRAL"] = {
+        ["NPC"] = {r = 252/255, g = 180/255, b = 27/255,},
+    },
+    ["TAPPED"] = {
+        --["NPC"] = {r = .8, g = .8, b = 1,},
+        ["NPC"] = {r = .7, g = .7, b = .7,},
+    },
 }
 
 HubData.Colors.ReactionColors = ReactionColors
@@ -130,18 +130,18 @@ HubData.Colors.NameReactionColors = NameReactionColors
 ------------------------------------------------------------------------------------
 
 local function CallbackUpdate()
-			for func in pairs(CallbackList) do
-				func(LocalVars)
-			end
+            for func in pairs(CallbackList) do
+                func(LocalVars)
+            end
 end
 
 local function EnableWatchers()
-	if LocalVars.WidgetsDebuffStyle == 2 then TidyPlatesWidgets.UseSquareDebuffIcon() else TidyPlatesWidgets.UseWideDebuffIcon()end
-	--TidyPlatesUtility:EnableGroupWatcher()
-	TidyPlatesUtility:EnableHealerTrack()
-	--TidyPlatesWidgets:EnableTankWatch()
+    if LocalVars.WidgetsDebuffStyle == 2 then TidyPlatesWidgets.UseSquareDebuffIcon() else TidyPlatesWidgets.UseWideDebuffIcon()end
+    --TidyPlatesUtility:EnableGroupWatcher()
+    TidyPlatesUtility:EnableHealerTrack()
+    --TidyPlatesWidgets:EnableTankWatch()
 
-	CallbackUpdate()
+    CallbackUpdate()
 end
 
 local CreateVariableSet = TidyPlatesHubRapidPanel.CreateVariableSet
@@ -149,94 +149,94 @@ local CreateVariableSet = TidyPlatesHubRapidPanel.CreateVariableSet
 
 local function UseVariables(profileName)
 
-	local suffix = profileName or "Damage"
-	if suffix then
+    local suffix = profileName or "Damage"
+    if suffix then
 
-		if CurrentProfileName ~= suffix then 	-- Stop repeat loading
+        if CurrentProfileName ~= suffix then 	-- Stop repeat loading
 
-			local objectName = "HubPanelSettings"..suffix
+            local objectName = "HubPanelSettings"..suffix
 
-			LocalVars = TidyPlatesHubSettings[objectName] or CreateVariableSet(objectName)
+            LocalVars = TidyPlatesHubSettings[objectName] or CreateVariableSet(objectName)
 
-			MergeProfileValues(LocalVars, TidyPlatesHubDefaults)		-- If the value doesn't exist in the settings, create it.
+            MergeProfileValues(LocalVars, TidyPlatesHubDefaults)		-- If the value doesn't exist in the settings, create it.
 
-			CurrentProfileName = suffix
+            CurrentProfileName = suffix
 
-			CallbackUpdate()
-		end
+            CallbackUpdate()
+        end
 
-		return LocalVars
-	end
+        return LocalVars
+    end
 end
 
 ---------------
 -- Apply customization
 ---------------
 local function ApplyFontCustomization(style, defaults)
-	if not style then return end
-	style.frame.y = ((LocalVars.FrameVerticalPosition-.5)*50)-16
+    if not style then return end
+    style.frame.y = ((LocalVars.FrameVerticalPosition-.5)*50)-16
 
-	if LocalVars.TextUseBlizzardFont then
-		style.name.typeface = STANDARD_TEXT_FONT
-		style.level.typeface = STANDARD_TEXT_FONT
-		style.spelltext.typeface = STANDARD_TEXT_FONT
-		style.customtext.typeface = STANDARD_TEXT_FONT
-	else
-		style.name.typeface = defaults.name.typeface
-		style.level.typeface = defaults.level.typeface
-		style.spelltext.typeface = defaults.spelltext.typeface
-		style.customtext.typeface = defaults.customtext.typeface
-	end
+    if LocalVars.TextUseBlizzardFont then
+        style.name.typeface = STANDARD_TEXT_FONT
+        style.level.typeface = STANDARD_TEXT_FONT
+        style.spelltext.typeface = STANDARD_TEXT_FONT
+        style.customtext.typeface = STANDARD_TEXT_FONT
+    else
+        style.name.typeface = defaults.name.typeface
+        style.level.typeface = defaults.level.typeface
+        style.spelltext.typeface = defaults.spelltext.typeface
+        style.customtext.typeface = defaults.customtext.typeface
+    end
 
 
 end
 
 local function ApplyCustomBarSize(style, defaults)
 
-	if defaults then
-		-- Alter Widths
-		style.threatborder.width = defaults.threatborder.width * (LocalVars.FrameBarWidth or 1)
-		style.healthborder.width = defaults.healthborder.width * (LocalVars.FrameBarWidth or 1)
-		style.target.width = defaults.target.width * (LocalVars.FrameBarWidth or 1)
-		style.healthbar.width = defaults.healthbar.width * (LocalVars.FrameBarWidth or 1)
-		style.frame.width = defaults.frame.width * (LocalVars.FrameBarWidth or 1)
-		style.eliteicon.x = defaults.eliteicon.x * (LocalVars.FrameBarWidth or 1)
-	end
+    if defaults then
+        -- Alter Widths
+        style.threatborder.width = defaults.threatborder.width * (LocalVars.FrameBarWidth or 1)
+        style.healthborder.width = defaults.healthborder.width * (LocalVars.FrameBarWidth or 1)
+        style.target.width = defaults.target.width * (LocalVars.FrameBarWidth or 1)
+        style.healthbar.width = defaults.healthbar.width * (LocalVars.FrameBarWidth or 1)
+        style.frame.width = defaults.frame.width * (LocalVars.FrameBarWidth or 1)
+        style.eliteicon.x = defaults.eliteicon.x * (LocalVars.FrameBarWidth or 1)
+    end
 end
 
 local function ApplyStyleCustomization(style, defaults)
-	if not style then return end
-	style.level.show = (LocalVars.TextShowLevel == true)
-	style.target.show = (LocalVars.WidgetTargetHighlight == true)
-	style.eliteicon.show = (LocalVars.WidgetEliteIndicator == true)
+    if not style then return end
+    style.level.show = (LocalVars.TextShowLevel == true)
+    style.target.show = (LocalVars.WidgetTargetHighlight == true)
+    style.eliteicon.show = (LocalVars.WidgetEliteIndicator == true)
 
- 	ApplyCustomBarSize(style, defaults)
-	ApplyFontCustomization(style, defaults)
+     ApplyCustomBarSize(style, defaults)
+    ApplyFontCustomization(style, defaults)
 end
 
 
 local function ApplyProfileSettings(theme, ...)
-	-- When nil is passed, the theme is being deactivated
-	if not theme then return end
+    -- When nil is passed, the theme is being deactivated
+    if not theme then return end
 
-	ReactionColors.FRIENDLY.NPC = LocalVars.ColorFriendlyNPC
-	ReactionColors.FRIENDLY.PLAYER = LocalVars.ColorFriendlyPlayer
-	ReactionColors.HOSTILE.NPC = LocalVars.ColorHostileNPC
-	ReactionColors.HOSTILE.PLAYER = LocalVars.ColorHostilePlayer
-	ReactionColors.NEUTRAL.NPC = LocalVars.ColorNeutral
+    ReactionColors.FRIENDLY.NPC = LocalVars.ColorFriendlyNPC
+    ReactionColors.FRIENDLY.PLAYER = LocalVars.ColorFriendlyPlayer
+    ReactionColors.HOSTILE.NPC = LocalVars.ColorHostileNPC
+    ReactionColors.HOSTILE.PLAYER = LocalVars.ColorHostilePlayer
+    ReactionColors.NEUTRAL.NPC = LocalVars.ColorNeutral
 
-	NameReactionColors.FRIENDLY.NPC = LocalVars.TextColorFriendlyNPC
-	NameReactionColors.FRIENDLY.PLAYER = LocalVars.TextColorFriendlyPlayer
-	NameReactionColors.HOSTILE.NPC = LocalVars.TextColorHostileNPC
-	NameReactionColors.HOSTILE.PLAYER = LocalVars.TextColorHostilePlayer
-	NameReactionColors.NEUTRAL.NPC = LocalVars.TextColorNeutral
+    NameReactionColors.FRIENDLY.NPC = LocalVars.TextColorFriendlyNPC
+    NameReactionColors.FRIENDLY.PLAYER = LocalVars.TextColorFriendlyPlayer
+    NameReactionColors.HOSTILE.NPC = LocalVars.TextColorHostileNPC
+    NameReactionColors.HOSTILE.PLAYER = LocalVars.TextColorHostilePlayer
+    NameReactionColors.NEUTRAL.NPC = LocalVars.TextColorNeutral
 
-	EnableWatchers()
-	ApplyStyleCustomization(theme["Default"], theme["DefaultBackup"])
-	ApplyFontCustomization(theme["NameOnly"], theme["NameOnlyBackup"])
+    EnableWatchers()
+    ApplyStyleCustomization(theme["Default"], theme["DefaultBackup"])
+    ApplyFontCustomization(theme["NameOnly"], theme["NameOnlyBackup"])
 
-	TidyPlates:ForceUpdate()
-	RaidClassColors = CUSTOM_CLASS_COLORS or RAID_CLASS_COLORS
+    TidyPlates:ForceUpdate()
+    RaidClassColors = CUSTOM_CLASS_COLORS or RAID_CLASS_COLORS
 end
 
 
@@ -244,67 +244,67 @@ end
 local LocalVars = TidyPlatesHubDamageVariables
 
 local function OnInitialize(plate, theme)
-	if theme and theme.WidgetConfig then
-		TidyPlatesHubFunctions.OnInitializeWidgets(plate, theme.WidgetConfig)
-	end
+    if theme and theme.WidgetConfig then
+        TidyPlatesHubFunctions.OnInitializeWidgets(plate, theme.WidgetConfig)
+    end
 end
 
 local function OnActivateTheme(theme)
 
-	if not theme then
-		TidyPlatesWidgets.DisableAuraWatcher()
-	end
-	-- This gets called when switching themes.
-	-- Ideally, it should clear out old widget data when nil is reported.
+    if not theme then
+        TidyPlatesWidgets.DisableAuraWatcher()
+    end
+    -- This gets called when switching themes.
+    -- Ideally, it should clear out old widget data when nil is reported.
 end
 
 local function OnChangeProfile(theme, profile)
-	if profile then
+    if profile then
 
-		UseVariables(profile)
+        UseVariables(profile)
 
-		local theme = TidyPlates:GetTheme()
+        local theme = TidyPlates:GetTheme()
 
-		if theme then
-			if theme.ApplyProfileSettings then
-				ApplyProfileSettings(theme, "From OnChangeProfile")
-				TidyPlates:ForceUpdate()
-			end
-		end
-	end
+        if theme then
+            if theme.ApplyProfileSettings then
+                ApplyProfileSettings(theme, "From OnChangeProfile")
+                TidyPlates:ForceUpdate()
+            end
+        end
+    end
 end
 
 -- Quickly add functions to a Theme
 local function ApplyHubFunctions(theme)
-	theme.SetNameColor = TidyPlatesHubFunctions.SetNameColor
-	theme.SetScale = TidyPlatesHubFunctions.SetScale
-	theme.SetAlpha = TidyPlatesHubFunctions.SetAlpha
-	theme.SetHealthbarColor = TidyPlatesHubFunctions.SetHealthbarColor
-	theme.SetThreatColor = TidyPlatesHubFunctions.SetThreatColor
-	theme.SetCastbarColor = TidyPlatesHubFunctions.SetCastbarColor
-	theme.OnUpdate = TidyPlatesHubFunctions.OnUpdate
-	theme.OnContextUpdate = TidyPlatesHubFunctions.OnContextUpdate
-	theme.ShowConfigPanel = ShowTidyPlatesHubDamagePanel
-	theme.SetStyle = TidyPlatesHubFunctions.SetStyleBinary
-	theme.SetCustomText = TidyPlatesHubFunctions.SetCustomTextBinary
-	theme.OnInitialize = OnInitialize		-- Need to provide widget positions
-	theme.OnActivateTheme = OnActivateTheme -- called by Tidy Plates Core, Theme Loader
-	theme.ApplyProfileSettings = ApplyProfileSettings
-	theme.OnChangeProfile = OnChangeProfile
+    theme.SetNameColor = TidyPlatesHubFunctions.SetNameColor
+    theme.SetScale = TidyPlatesHubFunctions.SetScale
+    theme.SetAlpha = TidyPlatesHubFunctions.SetAlpha
+    theme.SetHealthbarColor = TidyPlatesHubFunctions.SetHealthbarColor
+    theme.SetThreatColor = TidyPlatesHubFunctions.SetThreatColor
+    theme.SetCastbarColor = TidyPlatesHubFunctions.SetCastbarColor
+    theme.OnUpdate = TidyPlatesHubFunctions.OnUpdate
+    theme.OnContextUpdate = TidyPlatesHubFunctions.OnContextUpdate
+    theme.ShowConfigPanel = ShowTidyPlatesHubDamagePanel
+    theme.SetStyle = TidyPlatesHubFunctions.SetStyleBinary
+    theme.SetCustomText = TidyPlatesHubFunctions.SetCustomTextBinary
+    theme.OnInitialize = OnInitialize		-- Need to provide widget positions
+    theme.OnActivateTheme = OnActivateTheme -- called by Tidy Plates Core, Theme Loader
+    theme.ApplyProfileSettings = ApplyProfileSettings
+    theme.OnChangeProfile = OnChangeProfile
 
-	-- Make Backup Copies of the default settings of the theme styles
-	theme["DefaultBackup"] = CopyTable(theme["Default"])
-	theme["NameOnlyBackup"] = CopyTable(theme["NameOnly"])
+    -- Make Backup Copies of the default settings of the theme styles
+    theme["DefaultBackup"] = CopyTable(theme["Default"])
+    theme["NameOnlyBackup"] = CopyTable(theme["NameOnly"])
 
-	if barStyle then
-		backupStyle.threatborder.default_width = barStyle.threatborder.width
-		backupStyle.healthborder.default_width = barStyle.healthborder.width
-		backupStyle.target.default_width = barStyle.target.width
-		backupStyle.healthbar.default_width = barStyle.healthbar.width
-		backupStyle.eliteicon.default_x = barStyle.eliteicon.x
-	end
+    if barStyle then
+        backupStyle.threatborder.default_width = barStyle.threatborder.width
+        backupStyle.healthborder.default_width = barStyle.healthborder.width
+        backupStyle.target.default_width = barStyle.target.width
+        backupStyle.healthbar.default_width = barStyle.healthbar.width
+        backupStyle.eliteicon.default_x = barStyle.eliteicon.x
+    end
 
-	return theme
+    return theme
 end
 
 ---------------------------------------------
@@ -324,23 +324,23 @@ TidyPlatesHubFunctions.ApplyHubFunctions = ApplyHubFunctions
 ---------------------------------------------
 --[[
 local function UseDamageVariables()
-	local objectName = "HubPanelSettingsDamage"
-	LocalVars = TidyPlatesHubSettings[objectName] or CreateVariableSet(objectName)
+    local objectName = "HubPanelSettingsDamage"
+    LocalVars = TidyPlatesHubSettings[objectName] or CreateVariableSet(objectName)
 
-	CallbackUpdate()
+    CallbackUpdate()
 
-	--EnableWatchers()
-	return LocalVars
+    --EnableWatchers()
+    return LocalVars
 end
 
 local function UseTankVariables()
-	local objectName = "HubPanelSettingsTank"
-	LocalVars = TidyPlatesHubSettings[objectName] or CreateVariableSet(objectName)
+    local objectName = "HubPanelSettingsTank"
+    LocalVars = TidyPlatesHubSettings[objectName] or CreateVariableSet(objectName)
 
-	CallbackUpdate()
+    CallbackUpdate()
 
-	--EnableWatchers()
-	return LocalVars
+    --EnableWatchers()
+    return LocalVars
 end
 
 
