@@ -453,7 +453,8 @@ Border:SetBackdrop({
             bgFile = "Interface/DialogFrame/UI-DialogBox-Background-Dark",
             edgeFile = "Interface/Tooltips/UI-Tooltip-Border",
             tile = true, tileSize = 16, edgeSize = 16,
-            insets = { left = 4, right = 4, top = 4, bottom = 4 }});
+            insets = { left = 4, right = 4, top = 4, bottom = 4 }
+        });
 Border:SetBackdropColor(0,0,0,1);
 Border:SetPoint("TOPLEFT", DropDownMenuFrame, "TOPLEFT")
 
