@@ -41,7 +41,7 @@ local function QuickSetPoints(frame, columnFrame, neighborFrame, xOffset, yOffse
         frame:SetPoint("LEFT", columnFrame, "LEFT", LeftOffset, 0)
 end
 
-local function CreateQuickSlider(name, label, ... ) --, neighborFrame, xOffset, yOffset)
+local function CreateQuickSlider(name, label, ... )
         local columnFrame = ...
         local frame = PanelHelpers:CreateSliderFrame(name, columnFrame, label, .5, 0, 1, .1)
         frame:SetWidth(250)
@@ -61,15 +61,12 @@ end
 local function CreateQuickCheckbutton(name, label, ...)
     local columnFrame = ...
     local frame = PanelHelpers:CreateCheckButton(name, columnFrame, label)
-    --frame.Label:SetFont("FONTS/ARIALN.TTF", 14)
-    -- Margins	-- Bottom/Left are supposed to be negative
     frame.Margins = { Left = 2, Right = 100, Top = 0, Bottom = 0,}
     QuickSetPoints(frame, ...)
     -- Set Feedback Function
     frame:SetScript("OnClick", function()
         --OnPanelItemChange()
         columnFrame.Callback()
-        --if columnFrame.OnFeedback then columnFrame:OnFeedback() end
     end)
     return frame, frame
 end
@@ -276,25 +273,10 @@ TidyPlatesHubRapidPanel.OnMouseWheelScrollFrame = OnMouseWheelScrollFrame
 ---------------
 -- Helpers
 ---------------
-local yellow, blue, red, orange = "|cffffff00", "|cFF3782D1", "|cFFFF1100", "|cFFFF6906"
-
 local GetPanelValues = TidyPlatesHubHelpers.GetPanelValues
 local SetPanelValues = TidyPlatesHubHelpers.SetPanelValues
-local ListToTable = TidyPlatesHubHelpers.ListToTable
---local ConvertStringToTable = TidyPlatesHubHelpers.ConvertStringToTable
---local ConvertDebuffListTable = TidyPlatesHubHelpers.ConvertDebuffListTable
 local CopyTable = TidyPlatesUtility.copyTable
 
---[[
-local function GetGlobalSettings()
-
-end
-
-local function SetGlobalSettings()
-
-end
-
---]]
 
 local function CheckVariableIntegrity(objectName)
     for i,v in pairs(TidyPlatesHubDefaults) do
@@ -467,13 +449,13 @@ local function CreateInterfacePanel( objectName, panelTitle, parentFrameName)
     --panel.MainLabel = CreateQuickHeadingLabel(nil, panelTitle, panel, nil, 16, 16)
     panel.MainLabel = CreateQuickHeadingLabel(nil, panelTitle, panel, nil, 16, 8)
 
-        -- Warnings
-        ------------------------------
+    -- Warnings
+    ------------------------------
     panel.WarningFrame = CreateFrame("Frame", objectName.."WarningFrame", panel , "BackdropTemplate")
     panel.WarningFrame:SetPoint("LEFT", 16, 0 )
     panel.WarningFrame:SetPoint("TOP", panel.MainLabel, "BOTTOM", 0, -8 )
-        panel.WarningFrame:SetPoint("RIGHT", -16 , 16 )
-        panel.WarningFrame:SetHeight(50)
+    panel.WarningFrame:SetPoint("RIGHT", -16 , 16 )
+    panel.WarningFrame:SetHeight(50)
     panel.WarningFrame:SetBackdrop({bgFile = "Interface/Tooltips/UI-Tooltip-Background",
                                                 edgeFile = "Interface/Tooltips/UI-Tooltip-Border",
                                                 --tile = true, tileSize = 16,
@@ -484,9 +466,9 @@ local function CreateInterfacePanel( objectName, panelTitle, parentFrameName)
     panel.WarningFrame:SetBackdropColor(.9, 0.3, 0.2, 1)
     panel.WarningFrame:SetBackdropBorderColor(0.2, 0.2, 0.2, 1)
     panel.WarningFrame:Hide()
-        -- Description
-        panel.Warnings = CreateQuickHeadingLabel(nil, "", panel.WarningFrame, nil, 8, -4)
-        -- Button
+    -- Description
+    panel.Warnings = CreateQuickHeadingLabel(nil, "", panel.WarningFrame, nil, 8, -4)
+    -- Button
     local WarningFixButton = CreateFrame("Button", objectName.."WarningFixButton", panel.WarningFrame, "TidyPlatesPanelButtonTemplate", "BackdropTemplate")
     WarningFixButton:SetPoint("RIGHT", -10, 0)
     WarningFixButton:SetWidth(150)
@@ -514,11 +496,11 @@ local function CreateInterfacePanel( objectName, panelTitle, parentFrameName)
     panel.ScrollFrameBorder:SetPoint("TOPLEFT", -4, 5)
     panel.ScrollFrameBorder:SetPoint("BOTTOMRIGHT", 3, -5)
     panel.ScrollFrameBorder:SetBackdrop({bgFile = "Interface/Tooltips/UI-Tooltip-Background",
-                                                edgeFile = "Interface/Tooltips/UI-Tooltip-Border",
-                                                --tile = true, tileSize = 16,
-                                                edgeSize = 16,
-                                                insets = { left = 4, right = 4, top = 4, bottom = 4 }
-                                                });
+                                         edgeFile = "Interface/Tooltips/UI-Tooltip-Border",
+                                         --tile = true, tileSize = 16,
+                                         edgeSize = 16,
+                                         insets = { left = 4, right = 4, top = 4, bottom = 4 }
+                                         })
     panel.ScrollFrameBorder:SetBackdropColor(0.05, 0.05, 0.05, 0)
     panel.ScrollFrameBorder:SetBackdropBorderColor(0.2, 0.2, 0.2, 0)
 

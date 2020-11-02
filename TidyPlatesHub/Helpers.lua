@@ -24,7 +24,6 @@ local function GetPanelValues(panel, targetTable)
 
     -- Update with values
     if panel and targetTable then
-        local index
         for index in pairs(targetTable) do
             if panel[index] then
                 targetTable[index] = panel[index]:GetValue()
