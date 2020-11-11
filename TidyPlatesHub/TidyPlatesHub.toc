@@ -8,7 +8,7 @@
 ## SavedVariablesPerCharacter: TidyPlatesHubSettings
 
 Defaults.lua
-CVars.lua
+#CVars.lua
 Helpers.lua
 Templates.lua
 

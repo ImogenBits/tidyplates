@@ -243,7 +243,6 @@ local HealerSpells = {
         -- Shaman
         ---------
         [974]   = "SHAMAN", -- Earth Shield
-        [17116] = "SHAMAN", -- Nature's Swiftness
         [16190] = "SHAMAN", -- Mana Tide Totem
         [61295] = "SHAMAN", -- Riptide
 

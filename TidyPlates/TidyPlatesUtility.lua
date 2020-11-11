@@ -393,7 +393,7 @@ local function CreateRadioButtons(self, reference, parent, numberOfButtons, defa
 
     return radioButtonSet
 end
-
+--                                  _,      name, self  , label, .5,       0,      1,   .1)
 local function CreateSliderFrame(self, reference, parent, label, val, minval, maxval, step, mode)
     local slider = CreateFrame("Slider", reference, parent, 'OptionsSliderTemplate', "BackdropTemplate")
     slider:SetWidth(100)
