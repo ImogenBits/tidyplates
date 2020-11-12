@@ -1,6 +1,215 @@
 local addonName, Internal = ...
 
+
+--! Stuff that probably shouldn't be locals
+local font = "Interface\\Addons\\TidyPlates\\Media\\DefaultFont.ttf"
+local divider = "Interface\\Addons\\TidyPlatesHub\\shared\\ThinBlackLine"
+
 --* Helpers
+local function setVar(self)
+    local varSet = self:GetParent():GetParent().varSet
+    varSet[self.name] = self:GetValue()
+end
+
+local function colorify(r, g, b, a)
+    if type (r) == "table" then
+        return r.g, r.b, r.b, r.a
+    else
+        return {
+            r = r,
+            g = g,
+            b = b,
+            a = a
+        }
+    end
+end
+
+local function colorPickerCallback(frame)
+    local function f(cancel)
+        if cancel then
+            frame:SetBackdropColor(unpack(cancel))
+        else
+            local a = OpacitySliderFrame:GetValue()
+            local r, g, b = ColorPickerFrame:GetColorRGB()
+            frame:SetBackdropColor(r, g, b, 1 - a)
+            frame:OnValueChanged()
+        end
+    end
+    return f
+end
+
+local function ShowColorPicker(frame)
+    local r, g, b, a = frame:GetBackdropColor()
+    local f = colorPickerCallback(frame)
+    ColorPickerFrame.func = f
+    ColorPickerFrame.opacityFunc = f
+    ColorPickerFrame.cancelFunc = f
+
+    ColorPickerFrame.previousValues = {r,g,b,a}
+    ColorPickerFrame:SetColorRGB(r,g,b);
+    ColorPickerFrame.hasOpacity = true
+    ColorPickerFrame.opacity = 1 - a
+
+    ColorPickerFrame:SetFrameStrata(frame:GetFrameStrata())
+    ColorPickerFrame:SetFrameLevel(frame:GetFrameLevel()+1)
+    ColorPickerFrame:Hide() -- Need to activate the OnShow handler
+    ColorPickerFrame:Show()
+end
+
+local function SetSliderMechanics(self, value, minimum, maximum, increment)
+    self:SetMinMaxValues(minimum, maximum)
+    self:SetValueStep(increment)
+    self:SetValue(value)
+end
+
+--* Dropdown
+local ShowDropdownMenu, HideDropdownMenu
+do
+    local DropDownMenuFrame = CreateFrame("Frame", nil, nil)
+    local MaxDropdownItems = 25
+
+    DropDownMenuFrame:SetSize(100, 100)
+    DropDownMenuFrame:SetFrameStrata("TOOLTIP");
+    DropDownMenuFrame:Hide()
+
+    local Border = CreateFrame("Frame", nil, DropDownMenuFrame, "BackdropTemplate")
+    Border:SetBackdrop{
+        bgFile = "Interface/DialogFrame/UI-DialogBox-Background-Dark",
+        edgeFile = "Interface/Tooltips/UI-Tooltip-Border",
+        tile = true, tileSize = 16, edgeSize = 16,
+        insets = {left = 4, right = 4, top = 4, bottom = 4}
+    }
+    Border:SetBackdropColor(0,0,0,1)
+    Border:SetPoint("TOPLEFT", DropDownMenuFrame, "TOPLEFT")
+
+    for i = 1, MaxDropdownItems do
+        local button = CreateFrame("Button", addonName.."DropdownMenuButton"..i, DropDownMenuFrame)
+        DropDownMenuFrame["Button"..i] = button
+
+        button:SetHeight(15)
+        button:SetPoint("RIGHT", DropDownMenuFrame, "RIGHT")
+        button:SetText("Button")
+
+        button.index = i
+
+        if i > 1 then
+            button:SetPoint("TOPLEFT", DropDownMenuFrame["Button"..i-1], "BOTTOMLEFT")
+        else
+            button:SetPoint("TOPLEFT", DropDownMenuFrame, "TOPLEFT", 10, -8)
+        end
+
+        local region = select(1, button:GetRegions())
+        region:SetJustifyH("LEFT")
+        region:SetPoint("LEFT", button, "LEFT")
+        region:SetPoint("RIGHT", button, "RIGHT")
+
+        button:SetHighlightTexture("Interface/QuestFrame/UI-QuestTitleHighlight")
+        button:SetNormalFontObject("GameFontHighlightSmallLeft")
+        button:SetHighlightFontObject("GameFontNormalSmallLeft")
+        button:Show()
+    end
+
+    function HideDropdownMenu()
+        DropDownMenuFrame:Hide()
+    end
+
+    function ShowDropdownMenu(sourceFrame, menu, clickScript)
+        if DropDownMenuFrame:IsShown() and DropDownMenuFrame.sourceFrame == sourceFrame then
+            HideDropdownMenu()
+            return
+        end
+
+        DropDownMenuFrame.sourceFrame = sourceFrame
+        local currentSelection = sourceFrame:GetValue()
+        local numOfItems = 0
+        local maxWidth = 0
+
+        for i = 1, MaxDropdownItems do
+            local item = menu[i]
+            local button = DropDownMenuFrame["Button"..i]
+
+            if item then
+                local itemText = item.text
+                local region1 = button:GetRegions()
+
+                maxWidth = max(maxWidth, button:GetTextWidth())
+                numOfItems = numOfItems + 1
+
+                if currentSelection == i or itemText == currentSelection then
+                    region1:SetTextColor(1, .8, 0)
+                    region1:SetFont(1, .8, 0)
+                else
+                    region1:SetTextColor(1, 1, 1)
+                end
+                
+
+                button:SetText(itemText)
+                button.Value = item.value
+                button.sourceFrame = sourceFrame
+                button:SetScript("OnClick", clickScript)
+                button:Show()
+            else
+                button:Hide()
+            end
+
+        end
+
+        DropDownMenuFrame:SetWidth(maxWidth + 20)
+        Border:SetPoint("BOTTOMRIGHT", DropDownMenuFrame["Button"..numOfItems], "BOTTOMRIGHT", 10, -12)
+        DropDownMenuFrame:SetPoint("TOPLEFT", sourceFrame, "BOTTOM")
+        DropDownMenuFrame:Show()
+        DropDownMenuFrame:Raise()
+
+        -- Make sure the menu stays visible when displayed
+        local LowerBound = Border:GetBottom() or 0
+        if 0 > LowerBound then
+            DropDownMenuFrame:SetPoint("TOPLEFT", sourceFrame, "BOTTOM", 0, LowerBound * -1)
+        end
+    end
+end
+
+DropdownMixin = {}
+
+function DropdownMixin:OnClick()
+    local sourceFrame = self:GetParent()
+    PlaySound(856)
+    ShowDropdownMenu(sourceFrame, sourceFrame.menu, self.OnClickItem)
+end
+
+function DropdownMixin:OnHide()
+    HideDropdownMenu()
+end
+
+function DropdownMixin:OnClickItem()
+    local sourceFrame = self.sourceFrame
+    sourceFrame:SetValue(sourceFrame.menu[self.index] or self.index)
+    sourceFrame:OnValueChanged()
+    PlaySound(856)
+    HideDropdownMenu()
+end
+
+function DropdownMixin:SetValue(value)
+    local itemText
+    local menu = self.menu
+
+    if menu[value] then
+        itemText = menu[value].text
+    else
+        for i, v in pairs(menu) do
+            if v.value == value then
+                itemText = v.text
+                break
+            end
+        end
+    end
+
+    self.Text:SetText(itemText)
+    self.value = value
+end
+
+function DropdownMixin:GetValue()
+    return self.value
+end
 
 --* Column
 local ColumnMixin = {}
@@ -20,43 +229,8 @@ function ColumnMixin:Init(index, width)
     self:SetColumnPosition(index, width)
 end
 
---* Element
-
-local ElementMixin = {}
-
-function ElementMixin:Init(event, margins, getter, setter)
-    if getter then
-        self.GetValue = getter
-    end
-    if setter then
-        self.SetValue = setter
-    end
-    self:HookScript(event, self.SetOption)
-    self.Margins = margins
-end
-
-function ElementMixin:SetOption()
-    local varSet = self:GetParent():GetParent().varSet
-    varSet[self.name] = self:GetValue()
-end
-
 --* Section
 local SectionMixin = {}
-
-function SectionMixin:Init(numColums)
-
-    -- Add Columns
-    self.columns = {}
-    local colWidth = self.GetWidth() / numColums
-    for i = 1, numColums, 1 do
-        local col = CreateFrame("Frame", self.name.."Column"..i, self)
-        self.columns[i] = col
-        Mixin(col, ColumnMixin)
-        col:Init(i, colWidth)
-    end
-    self:HookScript("OnSizeChanged", self.OnSizeChanged)
-
-end
 
 function SectionMixin:OnSizeChanged(width)
     local colWidth = width / #self.columns
@@ -65,8 +239,10 @@ function SectionMixin:OnSizeChanged(width)
     end
 end
 
+-- positions element within section
 function SectionMixin:AddElement(element, columnIndex, indent, xOffset, yOffset)
     local col = self.columns[columnIndex]
+    self[element.name] = element
     element:ClearAllPoints()
     element:SetPoint(
         "LEFT",
@@ -92,15 +268,20 @@ function SectionMixin:AddElement(element, columnIndex, indent, xOffset, yOffset)
             -(element.Margins.Top + (yOffset or 0))
         )
     end
+    col.bottomElem = element
 end
 
+-- functions that create various types of option selectors
 function SectionMixin:AddCheckButton(name, label, columnIndex, indent, xOffset, yOffset)
-    local frame = CreateFrame("CheckButton", name, self, "InterfaceOptionsCheckButtonTemplate")
-    frame.Label = _G[name.."Text"]
+    local frame = CreateFrame("CheckButton", addonName..name.."Frame", self, "InterfaceOptionsCheckButtonTemplate")
+    frame.name = name
+    frame.Label = _G[addonName..name.."FrameText"]
     frame.Label:SetText(label)
 
-    Mixin(frame, ElementMixin)
-    frame:Init("OnClick", {Left = 2, Right = 100, Top = 0, Bottom = 0}, frame.GetChecked, frame.SetChecked)
+    frame.Margins = {Left = 2, Right = 100, Top = 0, Bottom = 0}
+    frame:HookScript("OnClick", setVar)
+    frame.GetValue = frame.GetChecked
+    frame.SetValue = frame.SetChecked
 
     self:AddElement(frame, columnIndex, indent, xOffset, yOffset)
 
@@ -109,20 +290,23 @@ end
 
 function SectionMixin:AddSlider(name, label, columnIndex, indent, xOffset, yOffset,
                                 val, minVal, maxVal, step, mode)
-    local frame = CreateFrame("Slider", name, self, "OptionsSliderTemplate")
-    frame:SetWidth(250)
-    frame:SetHeight(15)
+    local frame = CreateFrame("Slider", addonName..name.."Frame", self, "OptionsSliderTemplate")
+    frame.name = name
+    frame.Margins = {Left = 12, Right = 8, Top = 20, Bottom = 13}
+    frame.SetSliderMechanics = SetSliderMechanics
+    frame:SetSize(250, 15)
     frame:SetMinMaxValues(minVal or 0, maxVal or 1)
     frame:SetValueStep(step or .1)
     frame:SetValue(val or .5)
     frame:SetOrientation("HORIZONTAL")
     frame:Enable()
+    frame:HookScript("OnMouseUp", setVar)
 
     frame.Label = frame:CreateFontString(nil, 'ARTWORK', 'GameFontNormal')
     frame.Label:SetPoint("TOPLEFT", -5, 18)
     frame.Label:SetText(label or "")
-    frame.Low = _G[name.."Low"]
-    frame.High = _G[name.."High"]
+    frame.Low = _G[addonName..name.."FrameLow"]
+    frame.High = _G[addonName..name.."FrameHigh"]
 
     frame.Value = frame:CreateFontString(nil, 'ARTWORK', 'GameFontWhite')
     frame.Value:SetPoint("BOTTOM", 0, -10)
@@ -145,65 +329,63 @@ function SectionMixin:AddSlider(name, label, columnIndex, indent, xOffset, yOffs
         frame.High:SetText(ceil((maxval or 1) * 100).."%")
     end
 
-    Mixin(frame, ElementMixin)
-    frame:Init("OnMouseUp", {Left = 12, Right = 8, Top = 20, Bottom = 13})
-
     self:AddElement(frame, columnIndex, indent, xOffset, yOffset)
 
-    function frame:SetSliderMechanics(value, minimum, maximum, increment)
-        self:SetMinMaxValues(minimum, maximum)
-        self:SetValueStep(increment)
-        self:SetValue(value)
-    end
-    
     return frame
 end
 
 function SectionMixin:AddPercentSlider(name, label, columnIndex, indent, xOffset, yOffset)
-    return self:AddSlider(name, label, columnIndex, indent, xOffset, yOffset,
-                          0.5, 0, 1, 0.1)
+    return self:AddSlider(name, label, columnIndex, indent, xOffset, yOffset, 0.5, 0, 1, 0.1)
 end
 
 function SectionMixin:AddEditBox(name, label, columnIndex, indent, xOffset, yOffset)
-    local frame = CreateFrame("ScrollFrame", name, columnFrame, "UIPanelScrollFrameTemplate")
+    local frame = CreateFrame("ScrollFrame", addonName..name.."Frame", columnFrame, "UIPanelScrollFrameTemplate")
+    frame:SetSize(165, 125)
+    frame.name = name
+    frame.Margins = {Left = 4, Right = 24, Top = 8, Bottom = 8}
+    frame.GetValue = EditBox.GetText
+    frame.SetValue = EditBox.SetText
+    
     frame.BorderFrame = CreateFrame("Frame", nil, frame, "BackdropTemplate")
-    local EditBox = CreateFrame("EditBox", nil, frame)
-
-    frame:SetWidth(165)
-    frame:SetHeight(125)
-
     frame.BorderFrame:SetPoint("TOPLEFT", 0, 5)
     frame.BorderFrame:SetPoint("BOTTOMRIGHT", 3, -5)
     frame.BorderFrame:SetBackdrop{
         bgFile = "Interface/Tooltips/UI-Tooltip-Background",
         edgeFile = "Interface/Tooltips/UI-Tooltip-Border",
         tile = true, tileSize = 16, edgeSize = 16,
-        insets = { left = 4, right = 4, top = 4, bottom = 4 }
+        insets = {left = 4, right = 4, top = 4, bottom = 4}
     }
     frame.BorderFrame:SetBackdropColor(0.05, 0.05, 0.05, 0)
     frame.BorderFrame:SetBackdropBorderColor(0.5, 0.5, 0.5, 1)
 
+    local EditBox = CreateFrame("EditBox", nil, frame)
+    frame.EditBox = EditBox
     EditBox:SetPoint("TOPLEFT")
     EditBox:SetPoint("BOTTOMLEFT")
-    EditBox:SetHeight(100)
-    EditBox:SetWidth(150)
+    EditBox:SetSize(150, 100)
     EditBox:SetMultiLine(true)
     EditBox:SetFrameLevel(frame:GetFrameLevel()-1)
     EditBox:SetFont("Fonts\\FRIZQT__.TTF", 11, "NONE")
     EditBox:SetText("")
     EditBox:SetAutoFocus(false)
     EditBox:SetTextInsets(9, 6, 2, 2)
+    EditBox:HookScript("OnEnterPressed", setVar)
+    EditBox:HookScript("OnEditFocusLost", setVar)
+
+    frame.Label = frame:CreateFontString(nil, "ARTWORK", "GameFontNormal")
+    frame.Label:SetSize(165, 15)
+    frame.Label:ClearAllPoints()
+    frame.Label:SetPoint("BOTTOMLEFT", frame, "TOPLEFT")
+    frame.Label:SetText(label)
+    frame.Label:SetJustifyH("LEFT")
+    frame.Label:SetJustifyV("BOTTOM")
 
     frame:SetScrollChild(EditBox)
-    frame.EditBox = EditBox
     frame._SetWidth = frame.SetWidth
     function frame:SetWidth(value)
         frame:_SetWidth(value)
         EditBox:SetWidth(value)
     end
-
-    Mixin(frame, ElementMixin)
-    frame:Init("", {Left = 4, Right = 24, Top = 8, Bottom = 8}, EditBox.GetText, EditBox.SetText)
 
     self:AddElement(frame, columnIndex, indent, xOffset, yOffset)
 
@@ -212,8 +394,8 @@ end
 
 function SectionMixin:AddColorBox(name, label, columnIndex, indent, xOffset, yOffset)
     local frame = CreateFrame("Button", reference, parent, "BackdropTemplate")
-    frame:SetWidth(24)
-    frame:SetHeight(24)
+    frame.name = name
+    frame:SetSize(24, 24)
     frame:SetBackdrop{
         bgFile = "Interface\\ChatFrame\\ChatFrameColorSwatch",
         edgeFile = "Interface/Tooltips/UI-Tooltip-Border",
@@ -227,20 +409,117 @@ function SectionMixin:AddColorBox(name, label, columnIndex, indent, xOffset, yOf
     frame.Label:SetPoint("TOPLEFT", frame, "TOPRIGHT", 4, -7)
     frame.Label:SetText(label)
 
-    frame.GetValue = function() local color = {}; color.r, color.g, color.b, color.a = colorbox:GetBackdropColor(); return color end
-    frame.SetValue = function(self, color) colorbox:SetBackdropColor(color.r, color.g, color.b, color.a); end
+    frame.Margins = {Left = 5, Right = 100, Top = 3, Bottom = 2}
+    function frame:GetValue()
+        return colorify(self:GetBackdropColor())
+    end
+    function frame:SetValue(color)
+        self:SetBackdropColor(colorify(color))
+    end
+    frame.OnValueChanged = setVar
 
+    self:AddElement(frame, columnIndex, indent, xOffset, yOffset)
 
+    return frame
+end
 
-    Mixin(frame, ElementMixin)
-    frame:Init()
+-- menu :: [{text :: String, value :: String}]
+-- default :: Index | value
+function SectionMixin:AddDropdown(name, label, columnIndex, indent, xOffset, yOffset,
+                                  menu, default)
+    local frame = CreateFrame("Frame", addonName..name.."Frame", self, "TidyPlatesDropdownDrawerTemplate")
+    frame.Text = _G[addonName..name.."FrameText"]
+    frame.Button = _G[addonName..name.."FrameButton"]
+    frame:SetWidth(120)
+
+    frame.Label = frame:CreateFontString(nil, "ARTWORK", "GameFontNormal")
+    frame.Label:SetPoint("TOPLEFT", 18, 18)
+    frame.Label:SetText(label)
+
+    frame.Text:SetWidth(100)
+    fame.value = default
+    frame.menu = menu
+    frame.name = name
+    frame.Margins = {Left = -12, Right = 2, Top = 22, Bottom = 0}
+    frame.OnValueChanged = setVar
+
+    Mixin(frame, DropdownMixin)
+
+    frame.Button:SetScript("OnClick", frame.OnClick)
+    frame.Button:SetScript("OnHide", frame.OnHide)
+    frame:SetValue(default)
+
+    self:AddElement(frame, columnIndex, indent, xOffset, yOffset)
+
+    return frame
+end
+
+-- functions that create standalone labels
+function SectionMixin:AddHeading(name, label, columnIndex, indent, xOffset, yOffset)
+    local frame = CreateFrame("Frame", addonName..name.."Frame", self)
+    frame:SetSize(500, 26)
+    frame.Margins = {Left = 6, Right = 2, Top = 12, Bottom = 2}
+
+    frame.Text = frame:CreateFontString(nil, "ARTWORK", "GameFontNormal")
+    frame.Text:SetFont(font, 26)
+    frame.Text:SetTextColor(255/255, 105/255, 6/255)
+    frame.Text:SetAllPoints()
+    frame.Text:SetText(label)
+    frame.Text:SetJustifyH("LEFT")
+    frame.Text:SetJustifyV("BOTTOM")
+
+    frame.DividerLine = frame:CreateTexture(nil, 'ARTWORK')
+    frame.DividerLine:SetTexture(divider)
+    frame.DividerLine:SetSize(500, 12)
+    frame.DividerLine:SetPoint("BOTTOMLEFT", frame.Text, "TOPLEFT", 0, 5)
+
+    local bookmark = CreateFrame("Frame", nil, self)
+    bookmark:SetPoint("TOPLEFT", self, "TOPLEFT")
+    bookmark:SetPoint("BOTTOMRIGHT", frame, "BOTTOMRIGHT")
+    local panel = self:GetParent()
+    panel.Headings = panel.Headings or {}
+    panel.Headings[(#panel.Headings)+1] = label
+    panel.HeadingBookmarks = panel.HeadingBookmarks or {}
+    panel.HeadingBookmarks[label] = bookmark
+
+    self:AddElement(frame, columnIndex, indent, xOffset, yOffset)
+
+    return frame
+end
+
+function SectionMixin:AddLabel(name, label, columnIndex, indent, xOffset, yOffset)
+    local frame = CreateFrame("Frame", addonName..name.."Frame", self)
+    frame:SetSize(500, 15)
+    frame.Margins = {Left = 6, Right = 2, Top = 2, Bottom = 2}
+    
+    frame.Text = frame:CreateFontString(nil, "ARTWORK", "GameFontNormal")
+    frame.Text:SetAllPoints()
+    frame.Text:SetText(label)
+    frame.Text:SetJustifyH("LEFT")
+    frame.Text:SetJustifyV("BOTTOM")
+    
+    self:AddElement(frame, columnIndex, indent, xOffset, yOffset)
+
+    return frame
 end
 
 --* Panel
 local PanelMixin = {}
 
-function PanelMixin:Section(name, title)
+function PanelMixin:Section(name, title, numColums)
+    local frame = CreateFrame("Frame", addonName..name.."Frame", self)
+    frame.name = name
     
+    -- Add Columns
+    frame.columns = {}
+    local colWidth = frame.GetWidth() / numColums
+    for i = 1, numColums, 1 do
+        local col = CreateFrame("Frame", addonName..name.."FrameColumn"..i, frame)
+        frame.columns[i] = col
+        Mixin(col, ColumnMixin)
+        col:Init(i, colWidth)
+    end
+    frame:HookScript("OnSizeChanged", frame.OnSizeChanged)
 end
 
 function Internal.CreatePanel(objectName, title, parentFrameName)
