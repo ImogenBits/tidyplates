@@ -237,10 +237,22 @@ function SectionMixin:OnSizeChanged(width)
     for i, col in ipairs(self.columns) do
         col:SetColumnPosition(i, colWidth)
     end
+    self:AdjustSize()
+end
+
+function SectionMixin:AdjustSize()
+    local minDist
+    for i, col in ipairs(self.columns) do
+        if col.bottomElem then
+            minDist = min(minDist, col.bottomElem:GetBottom() - col.bottomElem.Margins.Bottom)
+        end
+    end
+    self:SetHeight(minDist and (self:GetBottom() - minDist) or 1)
 end
 
 -- positions element within section
 function SectionMixin:AddElement(element, columnIndex, indent, xOffset, yOffset)
+    columnIndex, indent, xOffset, yOffset = columnIndex or 1, indent or 0, xOffset or 0, yOffset or 0
     local col = self.columns[columnIndex]
     self[element.name] = element
     element:ClearAllPoints()
@@ -248,7 +260,7 @@ function SectionMixin:AddElement(element, columnIndex, indent, xOffset, yOffset)
         "LEFT",
         col,
         "LEFT",
-        element.Margins.Left + (indent * 16) + (xOffset or 0),
+        element.Margins.Left + (indent * 16) + xOffset,
         0
     )
     if col.bottomElem then
@@ -257,7 +269,7 @@ function SectionMixin:AddElement(element, columnIndex, indent, xOffset, yOffset)
             col.bottomElem,
             "BOTTOM",
             -(col.bottomElem:GetWidth() / 2),
-            -(element.Margins.Top + (yOffset or 0))
+            -(element.Margins.Top + yOffset)
         )
     else
         element:SetPoint(
@@ -265,10 +277,11 @@ function SectionMixin:AddElement(element, columnIndex, indent, xOffset, yOffset)
             col,
             "TOP",
             0,
-            -(element.Margins.Top + (yOffset or 0))
+            -(element.Margins.Top + yOffset)
         )
     end
     col.bottomElem = element
+    self:AdjustSize()
 end
 
 -- functions that create various types of option selectors
@@ -476,11 +489,7 @@ function SectionMixin:AddHeading(name, label, columnIndex, indent, xOffset, yOff
     local bookmark = CreateFrame("Frame", nil, self)
     bookmark:SetPoint("TOPLEFT", self, "TOPLEFT")
     bookmark:SetPoint("BOTTOMRIGHT", frame, "BOTTOMRIGHT")
-    local panel = self:GetParent()
-    panel.Headings = panel.Headings or {}
-    panel.Headings[(#panel.Headings)+1] = label
-    panel.HeadingBookmarks = panel.HeadingBookmarks or {}
-    panel.HeadingBookmarks[label] = bookmark
+    table.insert(self:GetParent().Headings, {label = label, bookmark = bookmark})
 
     self:AddElement(frame, columnIndex, indent, xOffset, yOffset)
 
@@ -506,11 +515,15 @@ end
 --* Panel
 local PanelMixin = {}
 
-function PanelMixin:Section(name, title, numColums)
+function PanelMixin:AddSection(name, title, numColums)
     local frame = CreateFrame("Frame", addonName..name.."Frame", self)
     frame.name = name
-    
-    -- Add Columns
+    frame.title = title
+    frame.panel = self
+    frame:SetHeight(1)
+    frame:SetPoint("TOPLEFT", self, "TOPLEFT")
+    frame:SetPoint("TOPRIGHT", self, "TOPRIGHT")
+
     frame.columns = {}
     local colWidth = frame.GetWidth() / numColums
     for i = 1, numColums, 1 do
@@ -520,10 +533,14 @@ function PanelMixin:Section(name, title, numColums)
         col:Init(i, colWidth)
     end
     frame:HookScript("OnSizeChanged", frame.OnSizeChanged)
+
+    frame:AddHeading(name.."Heading", title)
+
+    return frame
 end
 
-function Internal.CreatePanel(objectName, title, parentFrameName)
-    local panel = CreateFrame( "Frame", addonName..objectName.."InterfaceOptionPanel", UIParent, "BackdropTemplate")
+function Internal.CreatePanel(name, title, parentFrameName)
+    local panel = CreateFrame("Frame", addonName..name.."InterfaceOptionPanel", UIParent, "BackdropTemplate")
     panel:SetBackdrop{
         bgFile = "Interface/Tooltips/UI-Tooltip-Background",
         edgeFile = "Interface/Tooltips/UI-Tooltip-Border",
@@ -532,12 +549,32 @@ function Internal.CreatePanel(objectName, title, parentFrameName)
     }
     panel:SetBackdropColor(.1, .1, .1, .6)
     panel:SetBackdropBorderColor(0.2, 0.2, 0.2, 1)
+    panel.name = name
+    panel.title = title
+    panel.Headings = {}
+    Mixin(panel, PanelMixin)
 
-    panel.name = title
-    panel.objectName = objectName
-    if parentFrameName then
-        panel.parent = parentFrameName
-    end
+    panel.Label = 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
     --* Panel Header
     panel.MainLabel = CreateQuickHeadingLabel(nil, panelTitle, panel, nil, 16, 8)
