@@ -515,14 +515,27 @@ end
 --* Panel
 local PanelMixin = {}
 
-function PanelMixin:AddSection(name, title, numColums)
+function PanelMixin:AddSection(name, title, numColums, isHeader, headingXOffset, headingYOffset)
     local frame = CreateFrame("Frame", addonName..name.."Frame", self)
     frame.name = name
     frame.title = title
     frame.panel = self
     frame:SetHeight(1)
-    frame:SetPoint("TOPLEFT", self, "TOPLEFT")
-    frame:SetPoint("TOPRIGHT", self, "TOPRIGHT")
+
+    if isHeader then
+        frame:SetPoint("TOPLEFT", self, "TOPLEFT")
+        frame:SetPoint("TOPRIGHT", self, "TOPRIGHT")
+    else
+        if #self.sections == 0 then
+            frame:SetPoint("TOPLEFT", self.scrollFrame, "TOPLEFT")
+            frame:SetPoint("TOPRIGHT", self.scrollFrame, "TOPRIGHT")
+        else
+            local prevSection = self.sections[#self.sections]
+            frame:SetPoint("TOPLEFT", prevSection, "BOTTOMLEFT")
+            frame:SetPoint("TOPRIGHT", prevSection, "BOTTOMRIGHT")
+        end
+        table.insert(self.sections, frame)
+    end
 
     frame.columns = {}
     local colWidth = frame.GetWidth() / numColums
@@ -534,7 +547,7 @@ function PanelMixin:AddSection(name, title, numColums)
     end
     frame:HookScript("OnSizeChanged", frame.OnSizeChanged)
 
-    frame:AddHeading(name.."Heading", title)
+    frame:AddHeading(name.."Heading", title, nil, nil, headingXOffset, headingYOffset)
 
     return frame
 end
@@ -552,35 +565,13 @@ function Internal.CreatePanel(name, title, parentFrameName)
     panel.name = name
     panel.title = title
     panel.Headings = {}
+    panel.sections = {}
     Mixin(panel, PanelMixin)
 
-    panel.Label = 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-    --* Panel Header
-    panel.MainLabel = CreateQuickHeadingLabel(nil, panelTitle, panel, nil, 16, 8)
+    panel.titleSection = panel:AddSection(titel.."TitleSection", title, 5, true, 16, 8)
 
     --* Warnings
-    panel.WarningFrame = CreateFrame("Frame", objectName.."WarningFrame", panel , "BackdropTemplate")
+    panel.WarningFrame = CreateFrame("Frame", addonName..name.."WarningFrame", panel, "BackdropTemplate")
     panel.WarningFrame:SetPoint("LEFT", 16, 0)
     panel.WarningFrame:SetPoint("TOP", panel.MainLabel, "BOTTOM", 0, -8)
     panel.WarningFrame:SetPoint("RIGHT", -16 , 16)

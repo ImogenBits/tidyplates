@@ -472,7 +472,7 @@ local function CreateInterfacePanel( objectName, panelTitle, parentFrameName)
     local WarningFixButton = CreateFrame("Button", objectName.."WarningFixButton", panel.WarningFrame, "TidyPlatesPanelButtonTemplate", "BackdropTemplate")
     WarningFixButton:SetPoint("RIGHT", -10, 0)
     WarningFixButton:SetWidth(150)
-        WarningFixButton:SetText("Fix Problem...")
+    WarningFixButton:SetText("Fix Problem...")
 
 
     -- Main Scrolled Frame
