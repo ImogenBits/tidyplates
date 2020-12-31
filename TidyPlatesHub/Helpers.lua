@@ -1,11 +1,35 @@
 local addonName, Internal = ...
 Internal.helpers = {}
+local helpers = Internal.helpers
 
 ----------------------------------
 -- Helpers
 ----------------------------------
 
-local function CallForStyleUpdate()
+local debugMsgFormat = "%sTidyPlates|r: Debug message %q from %q in function %q%s"
+local debugArgFormat = "%d: %s"
+function helpers.debugMsg(msg, object, func, ...)
+    if not TidyPlates.debug then
+        return
+    end
+
+    local args = nil
+    if select("#", ...) > 0 then
+        args = debugArgFormat:format(1, (...))
+        for i = 2, select("#", ...) do
+            args = args..", "..debugArgFormat:format(i, (select(i, ...)))
+        end
+    end
+
+    print(debugMsgFormat:format(
+            RED_FONT_COLOR_CODE,
+            msg,
+            object,
+            func,
+            args and " with args "..args or ""))
+end
+
+function helpers.CallForStyleUpdate()
 
     -- This happens when the Okay button is pressed, or a UI element is used
 
@@ -20,7 +44,7 @@ local function CallForStyleUpdate()
 
 end
 
-local function GetPanelValues(panel, targetTable)
+function helpers.GetPanelValues(panel, targetTable)
     -- First, clean up the target table
     -- Not yet implemented
 
@@ -34,7 +58,7 @@ local function GetPanelValues(panel, targetTable)
     end
 end
 
-local function SetPanelValues(panel, sourceTable)
+function helpers.SetPanelValues(panel, sourceTable)
     for index, value in pairs(sourceTable) do
         if panel[index] then
             panel[index]:SetValue(value)
@@ -43,7 +67,7 @@ local function SetPanelValues(panel, sourceTable)
 end
 
 
-local function MergeProfileValues(target, defaults)
+function helpers.MergeProfileValues(target, defaults)
     local i, v
     for i, v in pairs(defaults) do
         if target[i] == nil then
@@ -52,7 +76,7 @@ local function MergeProfileValues(target, defaults)
     end
 end
 
-local function ListToTable(...)
+function helpers.ListToTable(...)
     local t = {}
     local i = 1
     for index = 1, select("#", ...) do
@@ -65,7 +89,7 @@ local function ListToTable(...)
     return t
 end
 
-local function ConvertStringToTable(source, target)
+function helpers.ConvertStringToTable(source, target)
     local temp = ListToTable(strsplit("\n", source))
     target = wipe(target)
 
@@ -81,7 +105,7 @@ local function ConvertStringToTable(source, target)
     end
 end
 
-local function ConvertDebuffListTable(source, target, order)
+function helpers.ConvertDebuffListTable(source, target, order)
     local temp = ListToTable(strsplit("\n", source))
     target = wipe(target)
     if order then order = wipe(order) end
@@ -112,7 +136,7 @@ local function ConvertDebuffListTable(source, target, order)
 
 end
 
-local function AddHubFunction(functionTable, menuTable, functionPointer, functionDescription, functionKey )
+function helpers.AddHubFunction(functionTable, menuTable, functionPointer, functionDescription, functionKey )
     if functionTable then
         functionTable[functionKey or (#functionTable+1)] = functionPointer
     end
@@ -121,12 +145,3 @@ local function AddHubFunction(functionTable, menuTable, functionPointer, functio
         menuTable[#menuTable+1] = { text = functionDescription, value = functionKey }
     end
 end
-
-Internal.helpers.CallForStyleUpdate = CallForStyleUpdate
-Internal.helpers.GetPanelValues = GetPanelValues
-Internal.helpers.SetPanelValues = SetPanelValues
-Internal.helpers.MergeProfileValues = MergeProfileValues
-Internal.helpers.ListToTable = ListToTable
-Internal.helpers.ConvertStringToTable = ConvertStringToTable
-Internal.helpers.ConvertDebuffListTable = ConvertDebuffListTable
-Internal.helpers.AddHubFunction = AddHubFunction
