@@ -108,7 +108,7 @@ end
 
 
 --  Hub functions
-local AddHubFunction = Internal.helpers.AddHubFunction
+local AddHubFunction = Internal.Helpers.AddHubFunction
 
 local AlphaFunctionsEnemy = {}
 

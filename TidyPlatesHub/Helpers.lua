@@ -1,6 +1,6 @@
 local addonName, Internal = ...
-Internal.helpers = {}
-local helpers = Internal.helpers
+Internal.Helpers = {}
+local Helpers = Internal.Helpers
 
 ----------------------------------
 -- Helpers
@@ -8,7 +8,7 @@ local helpers = Internal.helpers
 
 local debugMsgFormat = "%sTidyPlates|r: Debug message %q from %q in function %q%s"
 local debugArgFormat = "%d: %s"
-function helpers.debugMsg(msg, object, func, ...)
+function Helpers.debugMsg(msg, object, func, ...)
     if not TidyPlates.debug then
         return
     end
@@ -29,7 +29,7 @@ function helpers.debugMsg(msg, object, func, ...)
             args and " with args "..args or ""))
 end
 
-function helpers.CallForStyleUpdate()
+function Helpers.CallForStyleUpdate()
 
     -- This happens when the Okay button is pressed, or a UI element is used
 
@@ -44,7 +44,7 @@ function helpers.CallForStyleUpdate()
 
 end
 
-function helpers.GetPanelValues(panel, targetTable)
+function Helpers.GetPanelValues(panel, targetTable)
     -- First, clean up the target table
     -- Not yet implemented
 
@@ -58,7 +58,7 @@ function helpers.GetPanelValues(panel, targetTable)
     end
 end
 
-function helpers.SetPanelValues(panel, sourceTable)
+function Helpers.SetPanelValues(panel, sourceTable)
     for index, value in pairs(sourceTable) do
         if panel[index] then
             panel[index]:SetValue(value)
@@ -67,7 +67,7 @@ function helpers.SetPanelValues(panel, sourceTable)
 end
 
 
-function helpers.MergeProfileValues(target, defaults)
+function Helpers.MergeProfileValues(target, defaults)
     local i, v
     for i, v in pairs(defaults) do
         if target[i] == nil then
@@ -76,7 +76,7 @@ function helpers.MergeProfileValues(target, defaults)
     end
 end
 
-function helpers.ListToTable(...)
+function Helpers.ListToTable(...)
     local t = {}
     local i = 1
     for index = 1, select("#", ...) do
@@ -89,7 +89,7 @@ function helpers.ListToTable(...)
     return t
 end
 
-function helpers.ConvertStringToTable(source, target)
+function Helpers.ConvertStringToTable(source, target)
     local temp = ListToTable(strsplit("\n", source))
     target = wipe(target)
 
@@ -105,7 +105,7 @@ function helpers.ConvertStringToTable(source, target)
     end
 end
 
-function helpers.ConvertDebuffListTable(source, target, order)
+function Helpers.ConvertDebuffListTable(source, target, order)
     local temp = ListToTable(strsplit("\n", source))
     target = wipe(target)
     if order then order = wipe(order) end
@@ -136,7 +136,7 @@ function helpers.ConvertDebuffListTable(source, target, order)
 
 end
 
-function helpers.AddHubFunction(functionTable, menuTable, functionPointer, functionDescription, functionKey )
+function Helpers.AddHubFunction(functionTable, menuTable, functionPointer, functionDescription, functionKey )
     if functionTable then
         functionTable[functionKey or (#functionTable+1)] = functionPointer
     end

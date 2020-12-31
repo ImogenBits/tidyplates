@@ -275,8 +275,8 @@ TidyPlatesHubRapidPanel.OnMouseWheelScrollFrame = OnMouseWheelScrollFrame
 ---------------
 -- Helpers
 ---------------
-local GetPanelValues = Internal.helpers.GetPanelValues
-local SetPanelValues = Internal.helpers.SetPanelValues
+local GetPanelValues = Internal.Helpers.GetPanelValues
+local SetPanelValues = Internal.Helpers.SetPanelValues
 local CopyTable = TidyPlatesUtility.copyTable
 
 

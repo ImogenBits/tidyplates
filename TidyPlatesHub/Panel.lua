@@ -6,10 +6,9 @@ local font = "Interface\\Addons\\TidyPlates\\Media\\DefaultFont.ttf"
 local divider = "Interface\\Addons\\TidyPlatesHub\\shared\\ThinBlackLine"
 
 --* Helpers
-local function setVar(self)
-    local varSet = self:GetParent():GetParent().varSet
-    varSet[self.name] = self:GetValue()
-end
+local debugMsg = Internal.Helpers.debugMsg
+
+local L = Internal.L
 
 local function colorify(r, g, b, a)
     if type (r) == "table" then
@@ -212,23 +211,39 @@ function DropdownMixin:GetValue()
 end
 
 --* Element
-local ElementMixin = {}
+local ElementMixin = {
+    name = "",
+    colIndex = 0,
+    index = 0,
+    Margins = {},
+    Label = {},
+}
 
 function ElementMixin:SetValue(val)
-    print("this should be overwritten")
+    debugMsg("this should be overwritten", self.name, "SetValue")
 end
 
-function ElementMixin:GetValue(val)
-    print("this should be overwritten")
+function ElementMixin:GetValue()
+    debugMsg("this should be overwritten", self.name, "GetValue")
 end
 
---TODO
-function ElementMixin:AlignWith(other)
-    --a
+function ElementMixin:SetVar()
+    -- this should probably be something different
+    local varSet = self:GetParent():GetParent().varSet
+    varSet[self.name] = self:GetValue()
+end
+
+function ElementMixin:GetVar()
+    -- this should probably be something different
+    local varSet = self:GetParent():GetParent().varSet
+    return varSet[self.name]
 end
 
 --* Column
-local ColumnMixin = {}
+local ColumnMixin = {
+    index = 0,
+    elements = {},
+}
 
 function ColumnMixin:SetColumnPosition(index, width)
     index = index or (self.index)
@@ -241,12 +256,17 @@ end
 
 function ColumnMixin:Init(index, width)
     self.index = index
-    self.bottomElem = nil
+    self.elements = {}
     self:SetColumnPosition(index, width)
 end
 
 --* Section
-local SectionMixin = {}
+local SectionMixin = {
+    name = "",
+    panel = {},
+    columns = {},
+    elements = {},
+}
 
 function SectionMixin:OnSizeChanged(width)
     local colWidth = width / #self.columns
@@ -259,18 +279,24 @@ end
 function SectionMixin:AdjustSize()
     local minDist
     for i, col in ipairs(self.columns) do
-        if col.bottomElem then
-            minDist = min(minDist, col.bottomElem:GetBottom() - col.bottomElem.Margins.Bottom)
+        if #col.elements > 0 then
+            local bottomElem = col.elements[#col.elements]
+            minDist = min(minDist, bottomElem:GetBottom() - bottomElem.Margins.Bottom)
         end
     end
     self:SetHeight(minDist and (self:GetBottom() - minDist) or 1)
 end
 
 -- positions element within section
-function SectionMixin:AddElement(element, columnIndex, indent, xOffset, yOffset)
+function SectionMixin:InsertElement(element, columnIndex, indent, xOffset, yOffset, alignWith)
     columnIndex, indent, xOffset, yOffset = columnIndex or 1, indent or 0, xOffset or 0, yOffset or 0
+
     local col = self.columns[columnIndex]
-    self[element.name] = element
+    self.elements[element.name] = element
+    table.insert(col.elements, element)
+    element.index = #col.elements
+    element.colIndex = columnIndex
+
     element:ClearAllPoints()
     element:SetPoint(
         "LEFT",
@@ -279,15 +305,16 @@ function SectionMixin:AddElement(element, columnIndex, indent, xOffset, yOffset)
         element.Margins.Left + (indent * 16) + xOffset,
         0
     )
-    if col.bottomElem then
+
+    if alignWith then
         element:SetPoint(
             "TOP",
-            col.bottomElem,
-            "BOTTOM",
-            -(col.bottomElem:GetWidth() / 2),
+            alignWith,
+            "TOP",
+            0,
             -(element.Margins.Top + yOffset)
         )
-    else
+    elseif element.index == 1 then
         element:SetPoint(
             "TOP",
             col,
@@ -295,31 +322,41 @@ function SectionMixin:AddElement(element, columnIndex, indent, xOffset, yOffset)
             0,
             -(element.Margins.Top + yOffset)
         )
+    else
+        element:SetPoint(
+            "TOP",
+            col.elements[element.index - 1],
+            "BOTTOM",
+            0,
+            -(element.Margins.Top + yOffset)
+        )
     end
-    col.bottomElem = element
+
     self:AdjustSize()
 end
 
 -- functions that create various types of option selectors
-function SectionMixin:AddCheckButton(name, label, columnIndex, indent, xOffset, yOffset)
+function SectionMixin:AddCheckButton(name, columnIndex, indent, xOffset, yOffset, alignWith)
     local frame = CreateFrame("CheckButton", addonName..name.."Frame", self, "InterfaceOptionsCheckButtonTemplate")
+    Mixin(frame, ElementMixin)
     frame.name = name
     frame.Label = _G[addonName..name.."FrameText"]
-    frame.Label:SetText(label)
+    frame.Label:SetText(L[name])
 
     frame.Margins = {Left = 2, Right = 100, Top = 0, Bottom = 0}
-    frame:HookScript("OnClick", setVar)
+    frame:HookScript("OnClick", self.SetVar)
     frame.GetValue = frame.GetChecked
     frame.SetValue = frame.SetChecked
 
-    self:AddElement(frame, columnIndex, indent, xOffset, yOffset)
+    self:InsertElement(frame, columnIndex, indent, xOffset, yOffset, alignWith)
 
     return frame
 end
 
-function SectionMixin:AddSlider(name, label, columnIndex, indent, xOffset, yOffset,
+function SectionMixin:AddSlider(name, columnIndex, indent, xOffset, yOffset, alignWith,
                                 val, minVal, maxVal, step, mode)
     local frame = CreateFrame("Slider", addonName..name.."Frame", self, "OptionsSliderTemplate")
+    Mixin(frame, ElementMixin)
     frame.name = name
     frame.Margins = {Left = 12, Right = 8, Top = 20, Bottom = 13}
     frame.SetSliderMechanics = SetSliderMechanics
@@ -329,11 +366,11 @@ function SectionMixin:AddSlider(name, label, columnIndex, indent, xOffset, yOffs
     frame:SetValue(val or .5)
     frame:SetOrientation("HORIZONTAL")
     frame:Enable()
-    frame:HookScript("OnMouseUp", setVar)
+    frame:HookScript("OnMouseUp", self.SetVar)
 
     frame.Label = frame:CreateFontString(nil, 'ARTWORK', 'GameFontNormal')
     frame.Label:SetPoint("TOPLEFT", -5, 18)
-    frame.Label:SetText(label or "")
+    frame.Label:SetText(L[name] or "")
     frame.Low = _G[addonName..name.."FrameLow"]
     frame.High = _G[addonName..name.."FrameHigh"]
 
@@ -358,17 +395,18 @@ function SectionMixin:AddSlider(name, label, columnIndex, indent, xOffset, yOffs
         frame.High:SetText(ceil((maxval or 1) * 100).."%")
     end
 
-    self:AddElement(frame, columnIndex, indent, xOffset, yOffset)
+    self:InsertElement(frame, columnIndex, indent, xOffset, yOffset, alignWith)
 
     return frame
 end
 
-function SectionMixin:AddPercentSlider(name, label, columnIndex, indent, xOffset, yOffset)
-    return self:AddSlider(name, label, columnIndex, indent, xOffset, yOffset, 0.5, 0, 1, 0.1)
+function SectionMixin:AddPercentSlider(name, columnIndex, indent, xOffset, yOffset, alignWith)
+    return self:AddSlider(name, columnIndex, indent, xOffset, yOffset, alignWith, 0.5, 0, 1, 0.1)
 end
 
-function SectionMixin:AddEditBox(name, label, columnIndex, indent, xOffset, yOffset)
+function SectionMixin:AddEditBox(name, columnIndex, indent, xOffset, yOffset, alignWith)
     local frame = CreateFrame("ScrollFrame", addonName..name.."Frame", columnFrame, "UIPanelScrollFrameTemplate")
+    Mixin(frame, ElementMixin)
     frame:SetSize(165, 125)
     frame.name = name
     frame.Margins = {Left = 4, Right = 24, Top = 8, Bottom = 8}
@@ -398,14 +436,14 @@ function SectionMixin:AddEditBox(name, label, columnIndex, indent, xOffset, yOff
     EditBox:SetText("")
     EditBox:SetAutoFocus(false)
     EditBox:SetTextInsets(9, 6, 2, 2)
-    EditBox:HookScript("OnEnterPressed", setVar)
-    EditBox:HookScript("OnEditFocusLost", setVar)
+    EditBox:HookScript("OnEnterPressed", self.SetVar)
+    EditBox:HookScript("OnEditFocusLost", self.SetVar)
 
     frame.Label = frame:CreateFontString(nil, "ARTWORK", "GameFontNormal")
     frame.Label:SetSize(165, 15)
     frame.Label:ClearAllPoints()
     frame.Label:SetPoint("BOTTOMLEFT", frame, "TOPLEFT")
-    frame.Label:SetText(label)
+    frame.Label:SetText(L[name])
     frame.Label:SetJustifyH("LEFT")
     frame.Label:SetJustifyV("BOTTOM")
 
@@ -416,13 +454,14 @@ function SectionMixin:AddEditBox(name, label, columnIndex, indent, xOffset, yOff
         EditBox:SetWidth(value)
     end
 
-    self:AddElement(frame, columnIndex, indent, xOffset, yOffset)
+    self:InsertElement(frame, columnIndex, indent, xOffset, yOffset, alignWith)
 
     return frame
 end
 
-function SectionMixin:AddColorBox(name, label, columnIndex, indent, xOffset, yOffset)
+function SectionMixin:AddColorBox(name, columnIndex, indent, xOffset, yOffset, alignWith)
     local frame = CreateFrame("Button", reference, parent, "BackdropTemplate")
+    Mixin(frame, ElementMixin)
     frame.name = name
     frame:SetSize(24, 24)
     frame:SetBackdrop{
@@ -436,7 +475,7 @@ function SectionMixin:AddColorBox(name, label, columnIndex, indent, xOffset, yOf
 
     frame.Label = frame:CreateFontString(nil, 'ARTWORK', 'GameFontWhiteSmall')
     frame.Label:SetPoint("TOPLEFT", frame, "TOPRIGHT", 4, -7)
-    frame.Label:SetText(label)
+    frame.Label:SetText(L[name])
 
     frame.Margins = {Left = 5, Right = 100, Top = 3, Bottom = 2}
     function frame:GetValue()
@@ -445,32 +484,33 @@ function SectionMixin:AddColorBox(name, label, columnIndex, indent, xOffset, yOf
     function frame:SetValue(color)
         self:SetBackdropColor(colorify(color))
     end
-    frame.OnValueChanged = setVar
+    frame.OnValueChanged = self.SetVar
 
-    self:AddElement(frame, columnIndex, indent, xOffset, yOffset)
+    self:InsertElement(frame, columnIndex, indent, xOffset, yOffset, alignWith)
 
     return frame
 end
 
 -- menu :: [{text :: String, value :: String}]
 -- default :: Index | value
-function SectionMixin:AddDropdown(name, label, columnIndex, indent, xOffset, yOffset,
+function SectionMixin:AddDropdown(name, columnIndex, indent, xOffset, yOffset, alignWith,
                                   menu, default)
     local frame = CreateFrame("Frame", addonName..name.."Frame", self, "TidyPlatesDropdownDrawerTemplate")
+    Mixin(frame, ElementMixin)
     frame.Text = _G[addonName..name.."FrameText"]
     frame.Button = _G[addonName..name.."FrameButton"]
     frame:SetWidth(120)
 
     frame.Label = frame:CreateFontString(nil, "ARTWORK", "GameFontNormal")
     frame.Label:SetPoint("TOPLEFT", 18, 18)
-    frame.Label:SetText(label)
+    frame.Label:SetText(L[name])
 
     frame.Text:SetWidth(100)
     fame.value = default
     frame.menu = menu
     frame.name = name
     frame.Margins = {Left = -12, Right = 2, Top = 22, Bottom = 0}
-    frame.OnValueChanged = setVar
+    frame.OnValueChanged = self.SetVar
 
     Mixin(frame, DropdownMixin)
 
@@ -478,22 +518,26 @@ function SectionMixin:AddDropdown(name, label, columnIndex, indent, xOffset, yOf
     frame.Button:SetScript("OnHide", frame.OnHide)
     frame:SetValue(default)
 
-    self:AddElement(frame, columnIndex, indent, xOffset, yOffset)
+    self:InsertElement(frame, columnIndex, indent, xOffset, yOffset, alignWith)
 
     return frame
 end
 
 -- functions that create standalone labels
-function SectionMixin:AddHeading(name, label, columnIndex, indent, xOffset, yOffset)
+function SectionMixin:AddHeading(name, columnIndex, indent, xOffset, yOffset, alignWith)
     local frame = CreateFrame("Frame", addonName..name.."Frame", self)
+    Mixin(frame, ElementMixin)
     frame:SetSize(500, 26)
     frame.Margins = {Left = 6, Right = 2, Top = 12, Bottom = 2}
+
+    function frame:GetValue() end
+    function frame:SetValue(val) end
 
     frame.Text = frame:CreateFontString(nil, "ARTWORK", "GameFontNormal")
     frame.Text:SetFont(font, 26)
     frame.Text:SetTextColor(255/255, 105/255, 6/255)
     frame.Text:SetAllPoints()
-    frame.Text:SetText(label)
+    frame.Text:SetText(L[name])
     frame.Text:SetJustifyH("LEFT")
     frame.Text:SetJustifyV("BOTTOM")
 
@@ -505,37 +549,47 @@ function SectionMixin:AddHeading(name, label, columnIndex, indent, xOffset, yOff
     local bookmark = CreateFrame("Frame", nil, self)
     bookmark:SetPoint("TOPLEFT", self, "TOPLEFT")
     bookmark:SetPoint("BOTTOMRIGHT", frame, "BOTTOMRIGHT")
-    table.insert(self:GetParent().Headings, {label = label, bookmark = bookmark})
+    table.insert(self:GetParent().headings, {label = L[name], bookmark = bookmark})
 
-    self:AddElement(frame, columnIndex, indent, xOffset, yOffset)
+    self:InsertElement(frame, columnIndex, indent, xOffset, yOffset, alignWith)
 
     return frame
 end
 
-function SectionMixin:AddLabel(name, label, columnIndex, indent, xOffset, yOffset)
+function SectionMixin:AddLabel(name, columnIndex, indent, xOffset, yOffset, alignWith)
     local frame = CreateFrame("Frame", addonName..name.."Frame", self)
+    Mixin(frame, ElementMixin)
     frame:SetSize(500, 15)
     frame.Margins = {Left = 6, Right = 2, Top = 2, Bottom = 2}
-    
+
+    function frame:GetValue() end
+    function frame:SetValue(val) end
+
     frame.Text = frame:CreateFontString(nil, "ARTWORK", "GameFontNormal")
     frame.Text:SetAllPoints()
-    frame.Text:SetText(label)
+    frame.Text:SetText(L[name])
     frame.Text:SetJustifyH("LEFT")
     frame.Text:SetJustifyV("BOTTOM")
-    
-    self:AddElement(frame, columnIndex, indent, xOffset, yOffset)
+
+    self:InsertElement(frame, columnIndex, indent, xOffset, yOffset, alignWith)
 
     return frame
 end
 
 --* Panel
-local PanelMixin = {}
+local PanelMixin = {
+    name = "",
+    sections = {},
+    headings = {},
+}
 
-function PanelMixin:AddSection(name, title, numColums, isHeader, headingXOffset, headingYOffset)
+function PanelMixin:AddSection(name, numColums, isHeader, headingXOffset, headingYOffset)
     local frame = CreateFrame("Frame", addonName..name.."Frame", self)
+    Mixin(frame, SectionMixin)
     frame.name = name
-    frame.title = title
     frame.panel = self
+    frame.colums = {}
+    frame.elements = {}
     frame:SetHeight(1)
 
     if isHeader then
@@ -563,13 +617,14 @@ function PanelMixin:AddSection(name, title, numColums, isHeader, headingXOffset,
     end
     frame:HookScript("OnSizeChanged", frame.OnSizeChanged)
 
-    frame:AddHeading(name.."Heading", title, nil, nil, headingXOffset, headingYOffset)
+    frame:AddHeading(name.."Heading", nil, nil, headingXOffset, headingYOffset)
 
     return frame
 end
 
-function Internal.CreatePanel(name, title, parentFrameName)
+function Internal.CreatePanel(name, parentFrameName)
     local panel = CreateFrame("Frame", addonName..name.."InterfaceOptionPanel", UIParent, "BackdropTemplate")
+    Mixin(panel, PanelMixin)
     panel:SetBackdrop{
         bgFile = "Interface/Tooltips/UI-Tooltip-Background",
         edgeFile = "Interface/Tooltips/UI-Tooltip-Border",
@@ -579,10 +634,8 @@ function Internal.CreatePanel(name, title, parentFrameName)
     panel:SetBackdropColor(.1, .1, .1, .6)
     panel:SetBackdropBorderColor(0.2, 0.2, 0.2, 1)
     panel.name = name
-    panel.title = title
-    panel.Headings = {}
+    panel.headings = {}
     panel.sections = {}
-    Mixin(panel, PanelMixin)
 
     panel.titleSection = panel:AddSection(titel.."TitleSection", title, 5, true, 16, 8)
 

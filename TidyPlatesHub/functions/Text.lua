@@ -28,7 +28,7 @@ local GetUnitSubtitle = TidyPlatesUtility.GetUnitSubtitle
 local GetUnitQuestInfo = TidyPlatesUtility.GetUnitQuestInfo
 
 
-local AddHubFunction = Internal.helpers.AddHubFunction
+local AddHubFunction = Internal.Helpers.AddHubFunction
 
 local function DummyFunction() end
 

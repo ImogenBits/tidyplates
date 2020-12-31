@@ -92,7 +92,7 @@ local function StyleBarsOnLowThreat(unit)
 end
 
 --[[
-local AddHubFunction = Internal.helpers.AddHubFunction
+local AddHubFunction = Internal.Helpers.AddHubFunction
 
 local StyleModeFunctions = {}
 

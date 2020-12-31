@@ -486,9 +486,9 @@ local function BuildHubPanel(panel)
 
     -- "RefreshSettings" is called; A) When PLAYER_ENTERING_WORLD is called, and; B) When changes are made to settings
 
-    local ConvertStringToTable = Internal.helpers.ConvertStringToTable
-    local ConvertDebuffListTable = Internal.helpers.ConvertDebuffListTable
-    local CallForStyleUpdate = Internal.helpers.CallForStyleUpdate
+    local ConvertStringToTable = Internal.Helpers.ConvertStringToTable
+    local ConvertDebuffListTable = Internal.Helpers.ConvertDebuffListTable
+    local CallForStyleUpdate = Internal.Helpers.CallForStyleUpdate
 
     function panel.RefreshSettings(LocalVars)
         --print("RefreshSettings", panel:IsShown())

@@ -43,7 +43,7 @@ local IsOffTanked = TidyPlatesHubFunctions.IsOffTanked
 local IsTankingAuraActive = TidyPlatesWidgets.IsPlayerTank
 local InCombatLockdown = InCombatLockdown
 local StyleDelegate = TidyPlatesHubFunctions.SetStyleNamed
-local AddHubFunction = Internal.helpers.AddHubFunction
+local AddHubFunction = Internal.Helpers.AddHubFunction
 
 ------------------------------------------------------------------------------
 ------------------------------------------------------------------------------

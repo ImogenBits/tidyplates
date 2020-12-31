@@ -25,7 +25,7 @@ local CopyTable = TidyPlatesUtility.copyTable
 local WidgetLib = TidyPlatesWidgets
 local valueToString = TidyPlatesUtility.abbrevNumber
 
-local MergeProfileValues = Internal.helpers.MergeProfileValues
+local MergeProfileValues = Internal.Helpers.MergeProfileValues
 
 local EnableTankWatch = TidyPlatesWidgets.EnableTankWatch
 local DisableTankWatch = TidyPlatesWidgets.DisableTankWatch
