@@ -1,3 +1,5 @@
+local addonName, Internal = ...
+
 local font = "Interface\\Addons\\TidyPlates\\Media\\DefaultFont.ttf"
 local divider = "Interface\\Addons\\TidyPlatesHub\\shared\\ThinBlackLine"
 
@@ -273,8 +275,8 @@ TidyPlatesHubRapidPanel.OnMouseWheelScrollFrame = OnMouseWheelScrollFrame
 ---------------
 -- Helpers
 ---------------
-local GetPanelValues = TidyPlatesHubHelpers.GetPanelValues
-local SetPanelValues = TidyPlatesHubHelpers.SetPanelValues
+local GetPanelValues = Internal.helpers.GetPanelValues
+local SetPanelValues = Internal.helpers.SetPanelValues
 local CopyTable = TidyPlatesUtility.copyTable
 
 

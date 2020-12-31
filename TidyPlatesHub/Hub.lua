@@ -1,3 +1,4 @@
+local addonName, Internal = ...
 
 --[[
 Tidy Plates Hub: Interface Panel
@@ -485,9 +486,9 @@ local function BuildHubPanel(panel)
 
     -- "RefreshSettings" is called; A) When PLAYER_ENTERING_WORLD is called, and; B) When changes are made to settings
 
-    local ConvertStringToTable = TidyPlatesHubHelpers.ConvertStringToTable
-    local ConvertDebuffListTable = TidyPlatesHubHelpers.ConvertDebuffListTable
-    local CallForStyleUpdate = TidyPlatesHubHelpers.CallForStyleUpdate
+    local ConvertStringToTable = Internal.helpers.ConvertStringToTable
+    local ConvertDebuffListTable = Internal.helpers.ConvertDebuffListTable
+    local CallForStyleUpdate = Internal.helpers.CallForStyleUpdate
 
     function panel.RefreshSettings(LocalVars)
         --print("RefreshSettings", panel:IsShown())

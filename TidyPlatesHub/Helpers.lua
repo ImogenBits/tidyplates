@@ -1,3 +1,5 @@
+local addonName, Internal = ...
+Internal.helpers = {}
 
 ----------------------------------
 -- Helpers
@@ -120,63 +122,11 @@ local function AddHubFunction(functionTable, menuTable, functionPointer, functio
     end
 end
 
-TidyPlatesHubHelpers = {}
-TidyPlatesHubHelpers.CallForStyleUpdate = CallForStyleUpdate
-TidyPlatesHubHelpers.GetPanelValues = GetPanelValues
-TidyPlatesHubHelpers.SetPanelValues = SetPanelValues
-TidyPlatesHubHelpers.MergeProfileValues = MergeProfileValues
-TidyPlatesHubHelpers.ListToTable = ListToTable
-TidyPlatesHubHelpers.ConvertStringToTable = ConvertStringToTable
-TidyPlatesHubHelpers.ConvertDebuffListTable = ConvertDebuffListTable
-TidyPlatesHubHelpers.AddHubFunction = AddHubFunction
-
-
-local function fromCSV (s)
-  s = s .. ','        -- ending comma
-  local t = {}        -- table to collect fields
-  local fieldstart = 1
-  repeat
-    -- next field is quoted? (start with `"'?)
-    if string.find(s, '^"', fieldstart) then
-      local a, c
-      local i  = fieldstart
-      repeat
-        -- find closing quote
-        a, i, c = string.find(s, '"("?)', i+1)
-      until c ~= '"'    -- quote not followed by quote?
-      if not i then error('unmatched "') end
-      local f = string.sub(s, fieldstart+1, i-1)
-      table.insert(t, (string.gsub(f, '""', '"')))
-      fieldstart = string.find(s, ',', i) + 1
-    else                -- unquoted; find next comma
-      local nexti = string.find(s, ',', fieldstart)
-      table.insert(t, string.sub(s, fieldstart, nexti-1))
-      fieldstart = nexti + 1
-    end
-  until fieldstart > string.len(s)
-  return t
-end
---[[
-local function EvaluateExpression(expression)
-    print(expression)
-    -- /eval oh blah, dee, oh , blah ,do
-    local t = fromCSV(expression)
-    for i,v in pairs(t) do
-        print(i,v)
-    end
-
-end
-
-
-SLASH_EVAL1 = '/eval'
-SlashCmdList['EVAL'] = EvaluateExpression
---]]
-
-
-
-
-
-
-
-
-
+Internal.helpers.CallForStyleUpdate = CallForStyleUpdate
+Internal.helpers.GetPanelValues = GetPanelValues
+Internal.helpers.SetPanelValues = SetPanelValues
+Internal.helpers.MergeProfileValues = MergeProfileValues
+Internal.helpers.ListToTable = ListToTable
+Internal.helpers.ConvertStringToTable = ConvertStringToTable
+Internal.helpers.ConvertDebuffListTable = ConvertDebuffListTable
+Internal.helpers.AddHubFunction = AddHubFunction

@@ -1,5 +1,6 @@
+local addonName, Internal = ...
 
-
+--! AddonName, HubData
 local AddonName, HubData = ...;
 local LocalVars = TidyPlatesHubDefaults
 
@@ -117,7 +118,7 @@ local ScaleFunctionsUniversal = { DummyFunction, ScaleFunctionByThreat, ScaleFun
 --]]
 
 
-local AddHubFunction = TidyPlatesHubHelpers.AddHubFunction
+local AddHubFunction = Internal.helpers.AddHubFunction
 
 AddHubFunction(ScaleFunctionsUniversal, TidyPlatesHubMenus.ScaleModes, DummyFunction, "None", "None")
 AddHubFunction(ScaleFunctionsUniversal, TidyPlatesHubMenus.ScaleModes, ScaleFunctionByThreat, "By Threat", "ByThreat")

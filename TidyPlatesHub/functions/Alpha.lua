@@ -1,4 +1,6 @@
+local addonName, Internal = ...
 
+--! AddonName, Hubdata seems fucked at best
 local AddonName, HubData = ...;
 local LocalVars = TidyPlatesHubDefaults
 
@@ -106,7 +108,7 @@ end
 
 
 --  Hub functions
-local AddHubFunction = TidyPlatesHubHelpers.AddHubFunction
+local AddHubFunction = Internal.helpers.AddHubFunction
 
 local AlphaFunctionsEnemy = {}
 

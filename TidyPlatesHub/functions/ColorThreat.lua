@@ -1,4 +1,6 @@
+local AddonName, Internal = ...
 
+--! AddonName, HubData
 local AddonName, HubData = ...;
 local LocalVars = TidyPlatesHubDefaults
 
@@ -41,7 +43,7 @@ local IsOffTanked = TidyPlatesHubFunctions.IsOffTanked
 local IsTankingAuraActive = TidyPlatesWidgets.IsPlayerTank
 local InCombatLockdown = InCombatLockdown
 local StyleDelegate = TidyPlatesHubFunctions.SetStyleNamed
-local AddHubFunction = TidyPlatesHubHelpers.AddHubFunction
+local AddHubFunction = Internal.helpers.AddHubFunction
 
 ------------------------------------------------------------------------------
 ------------------------------------------------------------------------------

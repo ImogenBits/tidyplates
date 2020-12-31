@@ -1,4 +1,6 @@
+local addonName, Internal = ...
 
+--! AddonName, HubData
 local AddonName, HubData = ...;
 local LocalVars = TidyPlatesHubDefaults
 
@@ -26,7 +28,7 @@ local GetUnitSubtitle = TidyPlatesUtility.GetUnitSubtitle
 local GetUnitQuestInfo = TidyPlatesUtility.GetUnitQuestInfo
 
 
-local AddHubFunction = TidyPlatesHubHelpers.AddHubFunction
+local AddHubFunction = Internal.helpers.AddHubFunction
 
 local function DummyFunction() end
 

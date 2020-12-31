@@ -1,7 +1,10 @@
+local addonName, Internal = ...
+
 
 ------------------------------------------------------------------------------------
 -- Tidy Plates Hub
 ------------------------------------------------------------------------------------
+--! AddonName, HubData
 local AddonName, HubData = ...;
 local LocalVars = TidyPlatesHubDefaults
 ------------------------------------------------------------------------------------
@@ -22,7 +25,7 @@ local CopyTable = TidyPlatesUtility.copyTable
 local WidgetLib = TidyPlatesWidgets
 local valueToString = TidyPlatesUtility.abbrevNumber
 
-local MergeProfileValues = TidyPlatesHubHelpers.MergeProfileValues
+local MergeProfileValues = Internal.helpers.MergeProfileValues
 
 local EnableTankWatch = TidyPlatesWidgets.EnableTankWatch
 local DisableTankWatch = TidyPlatesWidgets.DisableTankWatch

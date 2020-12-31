@@ -1,4 +1,6 @@
+local addonName, Internal = ...
 
+--! AddonName, HubData
 local AddonName, HubData = ...;
 local LocalVars = TidyPlatesHubDefaults
 
@@ -90,7 +92,7 @@ local function StyleBarsOnLowThreat(unit)
 end
 
 --[[
-local AddHubFunction = TidyPlatesHubHelpers.AddHubFunction
+local AddHubFunction = Internal.helpers.AddHubFunction
 
 local StyleModeFunctions = {}
 
