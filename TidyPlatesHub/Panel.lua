@@ -211,6 +211,22 @@ function DropdownMixin:GetValue()
     return self.value
 end
 
+--* Element
+local ElementMixin = {}
+
+function ElementMixin:SetValue(val)
+    print("this should be overwritten")
+end
+
+function ElementMixin:GetValue(val)
+    print("this should be overwritten")
+end
+
+--TODO
+function ElementMixin:AlignWith(other)
+    --a
+end
+
 --* Column
 local ColumnMixin = {}
 
