@@ -296,6 +296,7 @@ end
 local SectionMixin = {
     name = "",
     panel = {},
+    index = 0,
     columns = {},
     elements = {},
 }
@@ -554,7 +555,7 @@ function SectionMixin:AddDropdown(name, pos, menu, default)
 end
 
 -- functions that create standalone labels
-function SectionMixin:AddHeading(name, pos)
+function SectionMixin:AddHeadline(name, pos)
     local frame = CreateFrame("Frame", addonName..name.."Frame", self)
     Mixin(frame, ElementMixin)
     frame:SetSize(500, 26)
@@ -571,6 +572,14 @@ function SectionMixin:AddHeading(name, pos)
     frame.Text:SetJustifyH("LEFT")
     frame.Text:SetJustifyV("BOTTOM")
 
+    self:InsertElement(frame, pos)
+
+    return frame
+end
+
+function SectionMixin:AddHeading(name, pos)
+    local frame = self:AddHeadline(name, pos)
+
     frame.DividerLine = frame:CreateTexture(nil, 'ARTWORK')
     frame.DividerLine:SetTexture(divider)
     frame.DividerLine:SetSize(500, 12)
@@ -580,8 +589,6 @@ function SectionMixin:AddHeading(name, pos)
     bookmark:SetPoint("TOPLEFT", self, "TOPLEFT")
     bookmark:SetPoint("BOTTOMRIGHT", frame, "BOTTOMRIGHT")
     table.insert(self:GetParent().headings, {label = L[name], bookmark = bookmark})
-
-    self:InsertElement(frame, pos)
 
     return frame
 end
@@ -613,18 +620,19 @@ local PanelMixin = {
     headings = {},
 }
 
-function PanelMixin:AddSection(name, numColums, isHeader, headingXOffset, headingYOffset)
+function PanelMixin:AddSection(name, numColumns, isHeader, headingXOffset, headingYOffset)
     local frame = CreateFrame("Frame", addonName..name.."Frame", self)
     Mixin(frame, SectionMixin)
     frame.name = name
     frame.panel = self
-    frame.colums = {}
+    frame.columns = {}
     frame.elements = {}
     frame:SetHeight(1)
 
     if isHeader then
         frame:SetPoint("TOPLEFT", self, "TOPLEFT")
         frame:SetPoint("TOPRIGHT", self, "TOPRIGHT")
+        frame.index = 0
     else
         if #self.sections == 0 then
             frame:SetPoint("TOPLEFT", self.scrollFrame, "TOPLEFT")
@@ -635,11 +643,12 @@ function PanelMixin:AddSection(name, numColums, isHeader, headingXOffset, headin
             frame:SetPoint("TOPRIGHT", prevSection, "BOTTOMRIGHT")
         end
         table.insert(self.sections, frame)
+        frame.inex = #self.sections
     end
 
     frame.columns = {}
-    local colWidth = frame.GetWidth() / numColums
-    for i = 1, numColums, 1 do
+    local colWidth = frame:GetWidth() / numColumns
+    for i = 1, numColumns, 1 do
         local col = CreateFrame("Frame", addonName..name.."FrameColumn"..i, frame)
         frame.columns[i] = col
         Mixin(col, ColumnMixin)
@@ -667,7 +676,7 @@ function Internal.CreatePanel(name, parentFrameName)
     panel.headings = {}
     panel.sections = {}
 
-    panel.titleSection = panel:AddSection(titel.."TitleSection", title, 5, true, 16, 8)
+    panel.TitleSection = panel:AddSection(name.."TitleSection", 5, true, 16, 8)
 
     --* Warnings
     panel.WarningFrame = CreateFrame("Frame", addonName..name.."WarningFrame", panel, "BackdropTemplate")
