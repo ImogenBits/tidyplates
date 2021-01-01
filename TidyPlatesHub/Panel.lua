@@ -10,6 +10,38 @@ local debugMsg = Internal.Helpers.debugMsg
 
 local L = Internal.L
 
+local Position = {
+    colIndex,
+    indent,
+    xOffset,
+    yOffset,
+    alignWith
+}
+local posDefaults = {
+    colIndex = 1,
+    indent = 0,
+    xOffset = 0,
+    yOffset = 0,
+    alignWith = nil
+}
+local function unpackPos(pos)
+    local ret = {}
+    for i, key in ipairs(Position) do
+        if pos[i] and pos[key] then
+            debugMsg("overspecified position", "", "unpackPos", pos[i], pos[key], key)
+        end
+        if pos[key] then
+            ret[i] = pos[key]
+        elseif pos[i] then
+            ret[i] = pos[i]
+        else
+            ret[i] = posDefaults[key]
+        end
+    end
+
+    return unpack(ret, 1, #Position)
+end
+
 local function colorify(r, g, b, a)
     if type (r) == "table" then
         return r.g, r.b, r.b, r.a
@@ -288,14 +320,14 @@ function SectionMixin:AdjustSize()
 end
 
 -- positions element within section
-function SectionMixin:InsertElement(element, columnIndex, indent, xOffset, yOffset, alignWith)
-    columnIndex, indent, xOffset, yOffset = columnIndex or 1, indent or 0, xOffset or 0, yOffset or 0
+function SectionMixin:InsertElement(element, pos)
+    local colIndex, indent, xOffset, yOffset, alignWith = unpackPos(pos)
 
-    local col = self.columns[columnIndex]
+    local col = self.columns[colIndex]
     self.elements[element.name] = element
     table.insert(col.elements, element)
     element.index = #col.elements
-    element.colIndex = columnIndex
+    element.colIndex = colIndex
 
     element:ClearAllPoints()
     element:SetPoint(
@@ -336,7 +368,7 @@ function SectionMixin:InsertElement(element, columnIndex, indent, xOffset, yOffs
 end
 
 -- functions that create various types of option selectors
-function SectionMixin:AddCheckButton(name, columnIndex, indent, xOffset, yOffset, alignWith)
+function SectionMixin:AddCheckButton(name, pos)
     local frame = CreateFrame("CheckButton", addonName..name.."Frame", self, "InterfaceOptionsCheckButtonTemplate")
     Mixin(frame, ElementMixin)
     frame.name = name
@@ -348,13 +380,12 @@ function SectionMixin:AddCheckButton(name, columnIndex, indent, xOffset, yOffset
     frame.GetValue = frame.GetChecked
     frame.SetValue = frame.SetChecked
 
-    self:InsertElement(frame, columnIndex, indent, xOffset, yOffset, alignWith)
+    self:InsertElement(frame, pos)
 
     return frame
 end
 
-function SectionMixin:AddSlider(name, columnIndex, indent, xOffset, yOffset, alignWith,
-                                val, minVal, maxVal, step, mode)
+function SectionMixin:AddSlider(name, pos, val, minVal, maxVal, step, mode)
     local frame = CreateFrame("Slider", addonName..name.."Frame", self, "OptionsSliderTemplate")
     Mixin(frame, ElementMixin)
     frame.name = name
@@ -395,16 +426,16 @@ function SectionMixin:AddSlider(name, columnIndex, indent, xOffset, yOffset, ali
         frame.High:SetText(ceil((maxval or 1) * 100).."%")
     end
 
-    self:InsertElement(frame, columnIndex, indent, xOffset, yOffset, alignWith)
+    self:InsertElement(frame, pos)
 
     return frame
 end
 
-function SectionMixin:AddPercentSlider(name, columnIndex, indent, xOffset, yOffset, alignWith)
-    return self:AddSlider(name, columnIndex, indent, xOffset, yOffset, alignWith, 0.5, 0, 1, 0.1)
+function SectionMixin:AddPercentSlider(name, pos)
+    return self:AddSlider(name, pos, 0.5, 0, 1, 0.1)
 end
 
-function SectionMixin:AddEditBox(name, columnIndex, indent, xOffset, yOffset, alignWith)
+function SectionMixin:AddEditBox(name, pos)
     local frame = CreateFrame("ScrollFrame", addonName..name.."Frame", columnFrame, "UIPanelScrollFrameTemplate")
     Mixin(frame, ElementMixin)
     frame:SetSize(165, 125)
@@ -454,12 +485,12 @@ function SectionMixin:AddEditBox(name, columnIndex, indent, xOffset, yOffset, al
         EditBox:SetWidth(value)
     end
 
-    self:InsertElement(frame, columnIndex, indent, xOffset, yOffset, alignWith)
+    self:InsertElement(frame, pos)
 
     return frame
 end
 
-function SectionMixin:AddColorBox(name, columnIndex, indent, xOffset, yOffset, alignWith)
+function SectionMixin:AddColorBox(name, pos)
     local frame = CreateFrame("Button", reference, parent, "BackdropTemplate")
     Mixin(frame, ElementMixin)
     frame.name = name
@@ -486,15 +517,14 @@ function SectionMixin:AddColorBox(name, columnIndex, indent, xOffset, yOffset, a
     end
     frame.OnValueChanged = self.SetVar
 
-    self:InsertElement(frame, columnIndex, indent, xOffset, yOffset, alignWith)
+    self:InsertElement(frame, pos)
 
     return frame
 end
 
 -- menu :: [{text :: String, value :: String}]
 -- default :: Index | value
-function SectionMixin:AddDropdown(name, columnIndex, indent, xOffset, yOffset, alignWith,
-                                  menu, default)
+function SectionMixin:AddDropdown(name, pos, menu, default)
     local frame = CreateFrame("Frame", addonName..name.."Frame", self, "TidyPlatesDropdownDrawerTemplate")
     Mixin(frame, ElementMixin)
     frame.Text = _G[addonName..name.."FrameText"]
@@ -518,13 +548,13 @@ function SectionMixin:AddDropdown(name, columnIndex, indent, xOffset, yOffset, a
     frame.Button:SetScript("OnHide", frame.OnHide)
     frame:SetValue(default)
 
-    self:InsertElement(frame, columnIndex, indent, xOffset, yOffset, alignWith)
+    self:InsertElement(frame, pos)
 
     return frame
 end
 
 -- functions that create standalone labels
-function SectionMixin:AddHeading(name, columnIndex, indent, xOffset, yOffset, alignWith)
+function SectionMixin:AddHeading(name, pos)
     local frame = CreateFrame("Frame", addonName..name.."Frame", self)
     Mixin(frame, ElementMixin)
     frame:SetSize(500, 26)
@@ -551,12 +581,12 @@ function SectionMixin:AddHeading(name, columnIndex, indent, xOffset, yOffset, al
     bookmark:SetPoint("BOTTOMRIGHT", frame, "BOTTOMRIGHT")
     table.insert(self:GetParent().headings, {label = L[name], bookmark = bookmark})
 
-    self:InsertElement(frame, columnIndex, indent, xOffset, yOffset, alignWith)
+    self:InsertElement(frame, pos)
 
     return frame
 end
 
-function SectionMixin:AddLabel(name, columnIndex, indent, xOffset, yOffset, alignWith)
+function SectionMixin:AddLabel(name, pos)
     local frame = CreateFrame("Frame", addonName..name.."Frame", self)
     Mixin(frame, ElementMixin)
     frame:SetSize(500, 15)
@@ -571,7 +601,7 @@ function SectionMixin:AddLabel(name, columnIndex, indent, xOffset, yOffset, alig
     frame.Text:SetJustifyH("LEFT")
     frame.Text:SetJustifyV("BOTTOM")
 
-    self:InsertElement(frame, columnIndex, indent, xOffset, yOffset, alignWith)
+    self:InsertElement(frame, pos)
 
     return frame
 end
