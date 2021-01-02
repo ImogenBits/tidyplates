@@ -554,15 +554,17 @@ function SectionMixin:AddDropdown(name, pos, menu, default)
     return frame
 end
 
--- functions that create standalone labels
+-- functions that create elements that aren't option selectors
 function SectionMixin:AddHeadline(name, pos)
     local frame = CreateFrame("Frame", addonName..name.."Frame", self)
     Mixin(frame, ElementMixin)
     frame:SetSize(500, 26)
     frame.Margins = {Left = 6, Right = 2, Top = 12, Bottom = 2}
 
-    function frame:GetValue() end
-    function frame:SetValue(val) end
+    frame.GetValue = nil
+    frame.SetValue = nil
+    frame.GetVar = nil
+    frame.SetVar = nil
 
     frame.Text = frame:CreateFontString(nil, "ARTWORK", "GameFontNormal")
     frame.Text:SetFont(font, 26)
@@ -599,8 +601,10 @@ function SectionMixin:AddLabel(name, pos)
     frame:SetSize(500, 15)
     frame.Margins = {Left = 6, Right = 2, Top = 2, Bottom = 2}
 
-    function frame:GetValue() end
-    function frame:SetValue(val) end
+    frame.GetValue = nil
+    frame.SetValue = nil
+    frame.GetVar = nil
+    frame.SetVar = nil
 
     frame.Text = frame:CreateFontString(nil, "ARTWORK", "GameFontNormal")
     frame.Text:SetAllPoints()
@@ -620,7 +624,7 @@ local PanelMixin = {
     headings = {},
 }
 
-function PanelMixin:AddSection(name, numColumns, isHeader, headingXOffset, headingYOffset)
+function PanelMixin:AddSection(name, numColumns, headingXOffset, headingYOffset, isTitleSection)
     local frame = CreateFrame("Frame", addonName..name.."Frame", self)
     Mixin(frame, SectionMixin)
     frame.name = name
@@ -629,7 +633,7 @@ function PanelMixin:AddSection(name, numColumns, isHeader, headingXOffset, headi
     frame.elements = {}
     frame:SetHeight(1)
 
-    if isHeader then
+    if isTitleSection then
         frame:SetPoint("TOPLEFT", self, "TOPLEFT")
         frame:SetPoint("TOPRIGHT", self, "TOPRIGHT")
         frame.index = 0
@@ -676,7 +680,7 @@ function Internal.CreatePanel(name, parentFrameName)
     panel.headings = {}
     panel.sections = {}
 
-    panel.TitleSection = panel:AddSection(name.."TitleSection", 5, true, 16, 8)
+    panel.TitleSection = panel:AddSection(name.."TitleSection", 5, 16, 8, true)
 
     --* Warnings
     panel.WarningFrame = CreateFrame("Frame", addonName..name.."WarningFrame", panel, "BackdropTemplate")
@@ -696,7 +700,7 @@ function Internal.CreatePanel(name, parentFrameName)
     -- Description
     panel.Warnings = CreateQuickHeadingLabel(nil, "", panel.WarningFrame, nil, 8, -4)
     -- Button
-    local WarningFixButton = CreateFrame("Button", objectName.."WarningFixButton", panel.WarningFrame, "TidyPlatesPanelButtonTemplate", "BackdropTemplate")
+    local WarningFixButton = CreateFrame("Button", objectName.."WarningFixButton", panel.WarningFrame, "TidyPlatesPanelButtonTemplate")
     WarningFixButton:SetPoint("RIGHT", -10, 0)
     WarningFixButton:SetWidth(150)
         WarningFixButton:SetText("Fix Problem...")
