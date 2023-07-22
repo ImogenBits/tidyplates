@@ -24,7 +24,7 @@ local nameplate, extended, bars, regions, visual, carrier, plateid, threatborder
 local unit, unitcache, style, stylename, unitchanged				    			-- Temp/Local References
 local numChildren = -1                                                              -- Cache the current number of plates
 local activetheme = {}                                                              -- Table Placeholder
-local InCombat, HasTarget, HasMouseover = false, false, false					    -- Player State Data
+local InCombat, HasTarget, HasFocus, HasMouseover = false, false, false, false	    -- Player State Data
 local EnableFadeIn = true
 local ShowCastBars = true
 local EMPTY_TEXTURE = "Interface\\Addons\\TidyPlates\\Media\\Empty"
@@ -691,6 +691,11 @@ do
 		if unit.isMouseover and not unit.isTarget then visual.highlight:Show() else visual.highlight:Hide() end
 	end
 
+	-- UpdateIndicator_Focus
+	function UpdateIndicator_Focus()
+		if unit.isFocus and style.focus.show then visual.focus:Show() else visual.focus:Hide() end
+		if unit.isMouseover and not unit.isFocus then visual.highlight:Show() else visual.highlight:Hide() end
+	end
 
 	-- UpdateIndicator_RaidIcon
 	function UpdateIndicator_RaidIcon()
@@ -759,6 +764,8 @@ do
 
 		-- Better Layering
 		if unit.isTarget then
+			extended:SetFrameLevel(3000)
+		elseif unit.isFocus then
 			extended:SetFrameLevel(3000)
 		elseif unit.isMouseover then
 			extended:SetFrameLevel(3200)
@@ -1188,12 +1195,12 @@ do
 
 	local anchorgroup = {"healthborder", "threatborder", "castborder", "castnostop",
 						"name",  "spelltext", "customtext", "level",
-						"spellicon", "raidicon", "skullicon", "eliteicon", "target"}
+						"spellicon", "raidicon", "skullicon", "eliteicon", "target", "focus"}
 
 	local bargroup = {"castbar", "healthbar"}
 
 	local texturegroup = { "castborder", "castnostop", "healthborder", "threatborder", "eliteicon",
-						"skullicon", "highlight", "target", "spellicon", }
+						"skullicon", "highlight", "target", "focus", "spellicon", }
 
 
 	-- UpdateStyle:
@@ -1239,6 +1246,7 @@ do
 		if not unit.isBoss then visual.skullicon:Hide() end
 
 		if not unit.isTarget then visual.target:Hide() end
+		if not unit.isFocus then visual.focus:Hide() end
 		if not unit.isMarked then visual.raidicon:Hide() end
 
 	end
