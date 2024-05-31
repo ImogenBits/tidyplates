@@ -222,6 +222,16 @@ TemplateTheme.target = {
 	show = false,
 }
 
+TemplateTheme.focus = {
+	texture = EMPTY_TEXTURE,
+	width = 128,
+	height = 64,
+	x = 0,
+	y = -5,
+	anchor = "CENTER",
+	show = false,
+}
+
 TemplateTheme.threatcolor = {
 	LOW = { r = .75, g = 1, b = 0, a= 1, },
 	MEDIUM = { r = 1, g = 1, b = 0, a = 1, },
