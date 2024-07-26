@@ -198,6 +198,7 @@ local function ApplyCustomBarSize(style, defaults)
 		style.threatborder.width = defaults.threatborder.width * (LocalVars.FrameBarWidth or 1)
 		style.healthborder.width = defaults.healthborder.width * (LocalVars.FrameBarWidth or 1)
 		style.target.width = defaults.target.width * (LocalVars.FrameBarWidth or 1)
+		style.focus.width = defaults.focus.width * (LocalVars.FrameBarWidth or 1)
 		style.healthbar.width = defaults.healthbar.width * (LocalVars.FrameBarWidth or 1)
 		style.frame.width = defaults.frame.width * (LocalVars.FrameBarWidth or 1)
 		style.eliteicon.x = defaults.eliteicon.x * (LocalVars.FrameBarWidth or 1)
@@ -208,6 +209,7 @@ local function ApplyStyleCustomization(style, defaults)
 	if not style then return end
 	style.level.show = (LocalVars.TextShowLevel == true)
 	style.target.show = (LocalVars.WidgetTargetHighlight == true)
+	style.focus.show = (LocalVars.WidgetTargetHighlight == true)
 	style.eliteicon.show = (LocalVars.WidgetEliteIndicator == true)
 
  	ApplyCustomBarSize(style, defaults)
@@ -300,6 +302,7 @@ local function ApplyHubFunctions(theme)
 		backupStyle.threatborder.default_width = barStyle.threatborder.width
 		backupStyle.healthborder.default_width = barStyle.healthborder.width
 		backupStyle.target.default_width = barStyle.target.width
+		backupStyle.focus.default_width = barStyle.focus.width
 		backupStyle.healthbar.default_width = barStyle.healthbar.width
 		backupStyle.eliteicon.default_x = barStyle.eliteicon.x
 	end

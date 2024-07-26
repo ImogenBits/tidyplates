@@ -129,6 +129,17 @@ StyleDefault.target = {
 	show = true,
 }
 
+StyleDefault.focus = {
+	texture = "Interface\\Addons\\TidyPlates_Neon\\Neon_Select_Blue",
+	width = 128,
+	_width = 128,
+	height = 32,
+	x = 0,
+	y = VerticalAdjustment,
+	anchor = "CENTER",
+	show = true,
+}
+
 StyleDefault.raidicon = {
 	width = 22,
 	height = 22,
