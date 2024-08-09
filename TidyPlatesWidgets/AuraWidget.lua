@@ -29,23 +29,24 @@ local SetCooldown = CooldownNative.SetCooldown
 --* ---------------------------------------------------------------
 
 local function CreateAura(unit, index, filter, unitReaction)
-    local name, icon, stacks, auraType, duration, expiration, caster, stealable, showPersonal, spellid, canApply, bossdebuff, castByPlayer, showAll, timeMod = UnitAura(unit, index, filter)
+    local aura = C_UnitAuras.GetAuraDataByIndex(unit, index, filter)
+    if not aura then aura = {} end
     return {
-        name = name,
-        texture = icon,
-        stacks = stacks,
-        type = auraType,
-        duration = duration,
-        expiration = expiration,
-        caster = caster,
-        stealable = stealable,
-        showPersonal = showPersonal,
-        spellid = spellid,
-        canApply = canApply,
-        bossdebuff = bossdebuff,
-        castByPlayer = castByPlayer,
-        showAll = showAll,
-        timeMod = timeMod,
+        name = aura.name,
+        texture = aura.icon,
+        stacks = aura.applications,
+        type = aura.dispelName,
+        duration = aura.duration,
+        expiration = aura.expirationTime,
+        caster = aura.sourceUnit,
+        stealable = aura.isStealable,
+        showPersonal = aura.nameplateShowPersonal,
+        spellid = aura.spellId,
+        canApply = aura.canApplyAura,
+        bossdebuff = aura.isBossAura,
+        castByPlayer = aura.isFromPlayerOrPlayerPet,
+        showAll = aura.nameplateShowAll,
+        timeMod = aura.timeMod,
         reaction = unitReaction or (UnitIsFriend("player", unitid)
                                     and AURA_TARGET_FRIENDLY
                                     or AURA_TARGET_HOSTILE),

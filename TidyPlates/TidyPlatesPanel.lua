@@ -7,7 +7,7 @@ TidyPlatesPanel = {}
 
 local SetTheme = TidyPlatesInternal.SetTheme	-- Use the protected version
 
-local version = GetAddOnMetadata("TidyPlates", "version")
+local version = C_AddOns.GetAddOnMetadata("TidyPlates", "version")
 local versionString = "|cFF666666"..version
 
 local TidyPlatesInterfacePanel = PanelHelpers:CreatePanelFrame("TidyPlatesInterfacePanel", "Tidy Plates", nil)

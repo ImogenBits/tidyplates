@@ -675,31 +675,37 @@ end
 -- [[ COLOR
 local CreateColorBox
 do
-
 	local workingFrame
-	local function ChangeColor(cancel)
-		local a, r, g, b
-		if cancel then
-			--r,g,b,a = unpack(ColorPickerFrame.startingval )
-			workingFrame:SetBackdropColor(unpack(ColorPickerFrame.startingval ))
-		else
-			a, r, g, b = OpacitySliderFrame:GetValue(), ColorPickerFrame:GetColorRGB();
-			workingFrame:SetBackdropColor(r,g,b,1-a)
-			if workingFrame.OnValueChanged then workingFrame:OnValueChanged() end
-		end
+	local function ChangeColor(r, g, b, a)
+		workingFrame:SetBackdropColor(r, g, b, a)
+		if workingFrame.OnValueChanged then workingFrame:OnValueChanged() end
 	end
 
 	local function ShowColorPicker(frame)
 		local r,g,b,a = frame:GetBackdropColor()
 		workingFrame = frame
-		ColorPickerFrame.func, ColorPickerFrame.opacityFunc, ColorPickerFrame.cancelFunc = 	ChangeColor, ChangeColor, ChangeColor;
-		ColorPickerFrame.startingval  = {r,g,b,a}
-		ColorPickerFrame:SetColorRGB(r,g,b);
-		ColorPickerFrame.hasOpacity = true
-		ColorPickerFrame.opacity = 1 - a
-		ColorPickerFrame:SetFrameStrata(frame:GetFrameStrata())
-		ColorPickerFrame:SetFrameLevel(frame:GetFrameLevel()+1)
-		ColorPickerFrame:Hide(); ColorPickerFrame:Show(); -- Need to activate the OnShow handler.
+
+		ColorPickerFrame:SetupColorPickerAndShow({
+		r = r,
+		g = g,
+		b = b,
+		opacity = a,
+		hasOpacity = true,
+		swatchFunc = function()
+			r, g, b = ColorPickerFrame:GetColorRGB()
+			a = ColorPickerFrame:GetColorAlpha()
+			ChangeColor(r,g,b,a)
+		end,
+		opacityFunc = function()
+			r, g, b = ColorPickerFrame:GetColorRGB()
+			a = ColorPickerFrame:GetColorAlpha()
+			ChangeColor(r,g,b,a)
+		end,
+		cancelFunc = function()
+			r, g, b, a = ColorPickerFrame.previousValues.r, ColorPickerFrame.previousValues.g, ColorPickerFrame.previousValues.b, ColorPickerFrame.previousValues.a
+			ChangeColor(r,g,b,a)
+		end
+		})
 	end
 
 	function CreateColorBox(self, reference, parent, label, r, g, b, a)

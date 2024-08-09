@@ -74,9 +74,12 @@ local function UpdatePlayerRole()
 
 	-- Check Auras
 	for i = 1, 40 do
-		name, _, _, _, _, _, _, _, _, _, spellID = UnitBuff("player", i)	-- 11th
-		if TankAuras[tostring(spellID)] then
-			playerTankAura = true
+		local aura = C_UnitAuras.GetBuffDataByIndex("player", i)
+		if not aura then aura = {} end
+		if aura.spellId then
+			if TankAuras[tostring(aura.spellId)] then
+				playerTankAura = true
+			end
 		end
 	end
 
