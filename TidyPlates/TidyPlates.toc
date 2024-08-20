@@ -3,7 +3,7 @@
 ## Notes: Enjoys long walks on Darkshore
 ## Author: Binbwen and Friends
 ## X-Curse-Project-ID: 21409
-## Version: 6.22.1
+## Version: 6.22.2
 ## SavedVariablesPerCharacter: TidyPlatesOptions
 
 TidyPlates.xml
