@@ -247,7 +247,7 @@ end
 local function OnActivateTheme(theme)
 
 	if not theme then
-		TidyPlatesWidgets.DisableAuraWatcher()
+		TidyPlatesWidgets:DisableAuraWatcher()
 	end
 	-- This gets called when switching themes.
 	-- Ideally, it should clear out old widget data when nil is reported.
