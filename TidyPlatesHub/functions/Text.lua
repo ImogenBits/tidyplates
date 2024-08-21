@@ -177,8 +177,27 @@ local function HealthFunctionLevelHealth(unit)
 end
 
 
--- Arena Vitals (ID, Mana, Health
+-- Arena ID
 local function HealthFunctionArenaID(unit)
+	local arenastring = ""
+	local arenaindex = GetArenaIndex(unit.rawName)
+
+	--arenaindex = 2	-- Tester
+	if unit.type == "PLAYER" then
+
+		if arenaindex and arenaindex > 0 then
+			arenastring = "|cffff0000"..(tostring(arenaindex)).." |r"
+		end
+
+	end
+
+	return arenastring
+
+end
+
+
+-- Arena Vitals (ID, Mana, Health)
+local function HealthFunctionArenaIDHealthPower(unit)
 	local localid
 	local powercolor = White
 	local powerstring = ""
@@ -234,7 +253,6 @@ local function HealthFunctionArenaID(unit)
 
 	--]]
 end
-
 
 local HealthTextModesCustom = {}
 
@@ -320,7 +338,8 @@ AddHubFunction(HealthTextModeFunctions, TidyPlatesHubMenus.TextModes, HealthFunc
 AddHubFunction(HealthTextModeFunctions, TidyPlatesHubMenus.TextModes, HealthFunctionTargetOf, "Target Of", "HealthFunctionTargetOf")
 AddHubFunction(HealthTextModeFunctions, TidyPlatesHubMenus.TextModes, HealthFunctionLevel, "Level", "HealthFunctionLevel")
 AddHubFunction(HealthTextModeFunctions, TidyPlatesHubMenus.TextModes, HealthFunctionLevelHealth, "Level and Approx Health", "HealthFunctionLevelHealth")
-AddHubFunction(HealthTextModeFunctions, TidyPlatesHubMenus.TextModes, HealthFunctionArenaID, "Arena ID, Health, and Power", "HealthFunctionArenaID")
+AddHubFunction(HealthTextModeFunctions, TidyPlatesHubMenus.TextModes, HealthFunctionArenaID, "Arena ID", "HealthFunctionArenaID")
+AddHubFunction(HealthTextModeFunctions, TidyPlatesHubMenus.TextModes, HealthFunctionArenaIDHealthPower, "Arena ID, Health, and Power", "HealthFunctionArenaIDHealthPower")
 
 
 local function HealthTextDelegate(unit)
