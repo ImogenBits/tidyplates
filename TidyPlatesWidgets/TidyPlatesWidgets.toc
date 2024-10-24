@@ -1,4 +1,4 @@
-## Interface: 110002
+## Interface: 110005
 ## Title: Tidy Plates Widgets
 ## Notes: Library of Widgets
 ## Dependencies: TidyPlates
